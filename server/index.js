@@ -1,20 +1,18 @@
 const functions = require('firebase-functions');
 const express = require('express');
-// const order = require('./Order');
-import Order from './Order.js'
+const Order = require('./Order');
 
-// Create and Deploy Your First Cloud Functions
-// https://firebase.google.com/docs/functions/write-firebase-functions
-
+// General request handler
 var groceryStoreFunctions = express();
 
-// Adds a handler for POST requests to /groceryStore/placeOrder
+// Adds a handler for POST requests to '/groceryStore/placeOrder'
 groceryStoreFunctions.post('/placeOrder', (request, response) => {
-    var body = request.body
-    newOrder = new order.Order(body);
-    console.log(newOrder);
+    var body = request.body;
+    //Create a new Order object
+    const order = new Order(body);
+    //ToDo something with the order here
     response.send("POST received");
 });
 
-// Handles quesquests on /groceryStore
+// Handles quesquests on '/groceryStore'
 exports.groceryStore = functions.https.onRequest(groceryStoreFunctions);
