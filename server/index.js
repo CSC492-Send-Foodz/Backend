@@ -15,4 +15,4 @@ foodBankFunctions.post('/placeOrder', (request, response) => {
 });
 
 // Handles quesquests on '/foodBank'
-exports.groceryStore = functions.https.onRequest(foodBankFunctions);
+exports.foodBank = functions.https.onRequest(foodBankFunctions);
