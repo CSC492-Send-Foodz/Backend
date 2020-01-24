@@ -11,7 +11,7 @@ foodBankFunctions.post('/placeOrder', (request, response) => {
     //Create a new Order object
     const order = new Order(body);
     //ToDo something with the order here
-    response.send("POST received");
+    response.status(200).send("Order Received");
 });
 
 // Handles quesquests on '/foodBank'
