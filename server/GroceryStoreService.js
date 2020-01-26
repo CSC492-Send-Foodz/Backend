@@ -39,29 +39,21 @@ class GroceryStoreService {
 
 			//update actual quantity
 			this.updateInventory(order);
-
-			//this.outputToConsole(order);
 		}
 	}
 	
-
 	/*If the order can be fulfilled, update store inventory by decrementing 
 	 * store inventory items
 	 */
-
-
-	 //order: the whole order class
 	updateInventory(order){
 		for(var orditem in order.getInventory()){
 			const gs = this.globalInventory[order.getGroceryId()];
-			
-			gs[orditem].setQuantity(gs[orditem].getQuantity() - order.getInventory()[orditem]["quantity"]);
-			
+			gs[orditem].setQuantity(gs[orditem].getQuantity() - order.getInventory()[orditem]["quantity"]);	
 		}
 	}
 
 	// outputToConsole(order){
 	// 	console.log("Order Id " + order.getOrderId() + ", Status Update: " + order.getStatus());
 	// }
-
 }
+
