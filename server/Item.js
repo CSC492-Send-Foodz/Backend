@@ -1,6 +1,7 @@
  class Item {
     constructor(itemRef) {
         this.inventoryItemId = itemRef.inventoryItemId;
+        this.ediOrderNumber = itemRef.ediOrderNumber;
         this.name = itemRef.name;
         this.quantity = itemRef.quantity;
         this.expiryDate = Date(itemRef.expiryDate);
@@ -9,6 +10,10 @@
 
     getInventoryItemId() {
         return this.inventoryItemId;
+    }
+
+    getEdiOrderNumber(){
+        return this.ediOrderNumber;
     }
 
     getName() {
