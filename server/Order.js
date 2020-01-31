@@ -172,4 +172,4 @@ class Order {
     // End of Observer duties
 }
 
-module.export.Order = Order;
+module.exports = Order;
