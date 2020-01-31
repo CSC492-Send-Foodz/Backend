@@ -4,35 +4,55 @@ const express = require('express');
 const Order = require('./Order');
 var groceryStores = {};
 
+// Initialize App
 admin.initializeApp(functions.config().firebase);
 var gsDB = admin.firestore();
+
+
+/*******************Food Bank EndPoint *************************/
+
 
 // General request handler
 var foodBankFunctions = express();
 
 // Adds a handler for POST requests to '/foodBank/placeOrder'
 foodBankFunctions.post('/placeOrder', (request, response) => {
+
     var body = request.body;
+
     //Create a new Order object
     const order = new Order(body);
-    //ToDo something with the order here
+
+    //status check works
     response.status(200).send("Order Received");
 });
 
-// Handles quesquests on '/foodBank'
+// Handles requests on '/foodBank'
 exports.foodBank = functions.https.onRequest(foodBankFunctions);
 
+
+
+/*****************Grocery Store EndPoint **********************/
 var groceryStoreFunctions = express();
 
 groceryStoreFunctions.post('/sendUser', (request, response) => {
+    
     var userInfo = request.body;
+
     // TODO parse userInfo and register grocery store
     groceryStores[userInfo.storeId] = userInfo;
     
+    //status check works
     response.status(200).send("Grocery Store Registered");
-})
+});
 
+// Handles requests on '/grocerystore'
 exports.groceryStore = functions.https.onRequest(groceryStoreFunctions)
+
+
+
+
+/************************ Methods*************************************/
 
 function writeGroceryStoreData(storeId, companyName, location, storeNumber) {
     gsDB.ref('groceryStores/' + storeId).set({
