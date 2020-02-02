@@ -44,22 +44,10 @@ groceryStoreFunctions.post('/sendUser', (request, response) => {
 exports.groceryStore = functions.https.onRequest(groceryStoreFunctions)
 
 function writeGroceryStoreData(storeId, companyName, location, storeNumber) {
-    gsDB.ref('groceryStore/' + storeId).set({
-    companyName: companyName,
-    location: location,
-    storeNumber: storeNumber
-    });
-}
-
-function updateGroceryStoreData(storeId, companyName, location, storeNumber) {
-    var update = {};
-    var updatedInfo = {
+    var groceryStore = {
         companyName: companyName,
         location: location,
         storeNumber: storeNumber
-    }
-
-    update['groceryStore/' + storeId] = updatedInfo;
-
-    gsDB.ref().update(update);
+        }
+    gsDB.ref('groceryStore/' + storeId).set(groceryStore);
 }
