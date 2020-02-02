@@ -4,6 +4,11 @@ class OrderProcessor {
         this.activeDriver = {};
     }
 
+    getOrder(orderId){
+        //return order object
+        return this.activeOrder[orderId];
+    }
+
     processOrder(order, gs) {
         gs.updateStatus(order);
 
