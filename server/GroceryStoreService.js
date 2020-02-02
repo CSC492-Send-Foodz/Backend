@@ -57,3 +57,5 @@ class GroceryStoreService {
 	// }
 }
 
+module.exports = GroceryStoreService;
+
