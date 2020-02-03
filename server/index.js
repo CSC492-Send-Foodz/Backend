@@ -9,8 +9,6 @@ const EdiOrder = require('./EdiOrder');
 var groceryStores = {};
 var processor = new OrderProcessor();
 var groceryStoreServ = new GroceryStoreService(groceryStores);
-var order;
-
 
 // Initialize App
 admin.initializeApp(functions.config().firebase);
