@@ -6,6 +6,7 @@ module.exports.listen = function listen(query, groceryStore) {
         querySnapshot.docChanges().forEach(change => {
             if (change.type === 'added') {
                 console.log('Attribute added: ' + change.doc.data())
+            } else if (change.type === 'modified') {
                 console.log('Attribute modified: ' + change.doc.data().name)
             } else if (change.type === 'removed') {
                 console.log('Attribute removed: ' + change.doc.data())
