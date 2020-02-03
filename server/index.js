@@ -4,6 +4,7 @@ const express = require('express');
 const Order = require('./Order');
 const OrderProcessor = require('./OrderProcessor');
 const GroceryStoreService = require('./GroceryStoreService');
+const DatabaseListener = require('./DatabaseListener')
 
 var groceryStores = {};
 var processor = new OrderProcessor();
@@ -12,6 +13,10 @@ var groceryStoreServ = new GroceryStoreService(groceryStores);
 
 admin.initializeApp(functions.config().firebase);
 var gsDB = admin.firestore();
+
+// Creating a realime listener for updates to database
+let query = gsDB.collection('grocery').doc('store').collection('Inven');
+DatabaseListener.listen(query,groceryStores);
 
 // General request handler
 var foodBankFunctions = express();
