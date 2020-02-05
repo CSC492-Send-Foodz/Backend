@@ -15,7 +15,7 @@ class OrderProcessor {
                 driver.driverId = change.doc.ref.id;
                 console.log(driver);
                 // Update the list based on driver status
-                if (driver.status === 'available') {
+                if (driver.status === 'AVAILABLE') {
                     this.addDriverToDict(driver);
                 } else {
                     this.removeDriverFromDict(driver);
