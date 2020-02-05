@@ -1,10 +1,35 @@
+const ActiveOrderDao = require('./ActiveOrderDao');
+
 class OrderProcessor {
-    constructor() {
+    constructor(driverQuery) {
         this.activeOrder = {};
-        this.activeDriver = {};
+        this.activeDriver = [];
+        this.initDriverListener(driverQuery);
     }
 
-    getOrder(orderId){
+    initDriverListener(driverQuery) {
+        let observer = driverQuery.onSnapshot(querySnapshot => {
+            querySnapshot.docChanges().forEach(change => {
+                // Get the driver data
+                var driver = change.doc.data();
+                driver.driverId = change.doc.ref.id;
+                console.log(driver);
+                // Update the list based on driver status
+                if (driver.status === 'available') {
+                    this.addDriverToDict(driver);
+                } else {
+                    this.removeDriverFromDict(driver);
+                }
+                ActiveOrderDao.findMatchingActiveOrders(this.activeDriver);
+            });
+        });
+    }
+
+    notifyDrivers() {
+
+    }
+
+    getOrder(orderId) {
         //return order object
         return this.activeOrder[orderId];
     }
@@ -25,10 +50,7 @@ class OrderProcessor {
     }
 
     addDriverToDict(driver) {
-        if (driver.isValid()) {
-            this.activeDriver[driver.driverId] = driver;
-            console.log("Driver added")
-        }
+        this.activeDriver.push(driver);
     }
 
     removeOrderFromDict(order) {
@@ -39,9 +61,11 @@ class OrderProcessor {
     }
 
     removeDriverFromDict(driver) {
-        if (driver.driverId in this.activeDriver) {
-            delete this.activeDriver[driver.driverId];
-            console.log("Driver removed");
+        var idx;
+        for (idx = 0; idx < this.activeDriver.length; idx++) {
+            if (this.activeDriver[idx].driverId === driver.driverID) {
+                this.activeDriver.splice(idx, 1);
+            }
         }
     }
 }

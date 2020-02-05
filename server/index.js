@@ -6,13 +6,14 @@ const OrderProcessor = require('./OrderProcessor');
 const GroceryStoreService = require('./GroceryStoreService');
 const EdiOrder = require('./EdiOrder');
 
-var groceryStores = {};
-var processor = new OrderProcessor();
-var groceryStoreServ = new GroceryStoreService(groceryStores);
-
 // Initialize App
 admin.initializeApp(functions.config().firebase);
 var gsDB = admin.firestore();
+
+var groceryStores = {};
+var driverQuery = gsDB.collection('driver');
+var processor = new OrderProcessor(driverQuery);
+var groceryStoreServ = new GroceryStoreService(groceryStores);
 
 /*******************Food Bank EndPoint *************************/
 
