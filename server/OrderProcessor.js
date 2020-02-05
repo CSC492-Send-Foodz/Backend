@@ -4,7 +4,6 @@ const Driver = require('./Driver');
 class OrderProcessor {
     constructor(driverQuery) {
         this.activeOrder = {};
-        this.activeDriver = [];
         this.initDriverListener(driverQuery);
     }
 
@@ -14,20 +13,17 @@ class OrderProcessor {
                 // Get the driver data
                 var driver = change.doc.data();
                 driver.driverId = change.doc.ref.id;
-                var driverObj=Driver(driver);
-                console.log(driver);
-                // Update the list based on driver status
+                var driverObj = Driver(driver);
+                // Update the orders if the driver is Available
                 if (driver.status === 'Available') {
-                    this.addDriverToDict(driver);
-                } else {
-                    this.removeDriverFromDict(driver);
+                    // Find orders that the driver can deliver and send
+                    notifyDriver(ActiveOrderDao.findMatchingActiveOrders(driver));
                 }
-                ActiveOrderDao.findMatchingActiveOrders(this.activeDriver);
             });
         });
     }
 
-    notifyDrivers() {
+    notifyDriver(orders) {
 
     }
 
@@ -51,26 +47,11 @@ class OrderProcessor {
         this.activeOrder[order.orderId] = order;
     }
 
-    addDriverToDict(driver) {
-        this.activeDriver.push(driver);
-    }
-
     removeOrderFromDict(order) {
         if (order.orderId in this.activeOrder) {
             delete this.activeOrder[order.id];
             console.log("Order removed");
         }
-    }
-
-    removeDriverFromDict(driver) {
-        var idx;
-        for (idx = 0; idx < this.activeDriver.length; idx++) {
-            if (this.activeDriver[idx].driverId === driver.driverID) {
-                this.activeDriver.splice(idx, 1);
-                return true;
-            }
-        }
-        return false;
     }
 }
 
