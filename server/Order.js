@@ -1,25 +1,52 @@
-/* Order is observer of: Inventory
- *           observed by: Drivers
- */
+const OrderStates = {
+    LOOKING_FOR_DRIVER: "Looking For Diver",
+    UNABLE_TO_COMPLETE: "Order is unable to completed",
+    VALID: "Order is able to completed",
+    PICKUP_IN_PROGRESS: "Driver on the way to pick up inventory from the grocery store",
+    DROP_OFF_IN_PROGRESS: "Driver has picked up inventory from the grocery store.",
+    DELIVERED: "Driver has dropped off the inventory at the food bank",
+    INVALID: "Order is invalid"
+  };
 
 class Order {
 
     constructor(orderRef) {
         this.orderId = orderRef.orderId
-        this.status = orderRef.status;
         this.foodBankId = orderRef.foodBankId;
         this.groceryId = orderRef.groceryId;
         this.inventoryItems = {};
         this.timePlaced = Date(orderRef.time);
 
-        console.log(orderRef.inventory);
-
         this.parseItems(orderRef.inventory);
+        this.setStatus(orderRef.status)
     }
 
     getOrderId() { return this.orderId; }
 
-    setStatus(newStatus) { this.status = newStatus; }
+    setStatus(newStatus) { 
+        switch(newStatus){
+            case 'Looking For Diver':
+                this.status = OrderStates.LOOKING_FOR_DRIVER;
+                break;
+            case 'Unable To Complete':
+                this.status = OrderStates.UNABLE_TO_COMPLETE;
+                break;
+            case 'Valid':
+                this.status = OrderStates.VALID;
+                break;
+            case 'Pickup In Progress':
+                this.status = OrderStates.PICKUP_IN_PROGRESS;
+                break;
+            case 'Drop Off In Progress':
+                this.status = OrderStates.DROP_OFF_IN_PROGRESS;
+                break;
+            case 'Delivered':
+                this.status = OrderStates.DELIVERED;
+                break;
+            default:
+            this.status = OrderStates.INVALID;
+        }   
+    }
 
     getStatus() { return this.status; }
 
@@ -103,3 +130,4 @@ class Order {
 }
 
 module.exports =  Order;
+module.exports =  OrderStates;

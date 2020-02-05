@@ -1,9 +1,9 @@
 
-const driverStates = {
+const DriverStates = {
     AVAILABLE: "Driver available to deliever an order",
-    PICKUP_IN_PROGRESS: "Driver on the way to pick up inventory from the grocery store",
-    DROP_OFF_IN_PROGRESS: "Driver has picked up inventory from the grocery store.",
-    DELIVERED: "Driver has dropped off the inventory at the food bank",
+    ACCEPTED: "Driver has accepted order",
+    REJECTED: "Driver has rejected order",
+    CANCELLED: "Driver has cancelled order"
   };
 
 class Driver {
@@ -11,7 +11,7 @@ class Driver {
         this.driverId = driverRef.driverId;
         this.capacity = driverRef.capacity;
         this.defaultLocation = driverRef.defaultLocation;
-        this.status = driverRef.status;
+        this.setDriverStatus(driverRef.status);
     }
 
     getDriverId() { return this.driverId; }
@@ -20,8 +20,23 @@ class Driver {
     setDefaultLocation (defaultLocation) { this.defaultLocation = defaultLocation; }
     getDefaultLocation() { return this.defaultLocation; }
 
-    setDriverStatus(status){ this.status = status; }
+    setDriverStatus(newStatus) { 
+        switch(newStatus){
+            case 'Available':
+                this.status = DriverStates.AVAILABLE;
+                break;
+            case 'Accepted':
+                this.status = DriverStates.ACCEPTED;
+                break;
+            case 'Rejected':
+                this.status = DriverStates.REJECTED;
+                break;
+            case 'Cancelled':
+                this.status = DriverStates.CANCELLED;
+                break;
+        }   
+    }
     getDriverStatus() { return this.status; }
 }
 module.exports =  Driver;
-module.exports =  driverStates;
+module.exports =  DriverStates;
