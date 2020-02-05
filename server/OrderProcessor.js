@@ -3,11 +3,11 @@ const Driver = require('./Driver');
 
 class OrderProcessor {
     constructor(driverQuery) {
-        this.activeOrder = {};
         this.initDriverListener(driverQuery);
     }
 
     initDriverListener(driverQuery) {
+        // Construct a listener for driver statuses
         let observer = driverQuery.onSnapshot(querySnapshot => {
             querySnapshot.docChanges().forEach(change => {
                 // Get the driver data
@@ -17,41 +17,16 @@ class OrderProcessor {
                 // Update the orders if the driver is Available
                 if (driver.status === 'Available') {
                     // Find orders that the driver can deliver and send
-                    notifyDriver(ActiveOrderDao.findMatchingActiveOrders(driver));
+                    notifyDriver(driver, ActiveOrderDao.findMatchingActiveOrders(driver));
                 }
             });
         });
     }
 
-    notifyDriver(orders) {
-
-    }
-
-    getOrder(orderId) {
-        //return order object
-        return this.activeOrder[orderId];
-    }
-
-    processOrder(order, gs) {
-        gs.updateStatus(order);
-
-        if (order.status !== 'Invalid') {
-            this.addOrderToDict(order);
-            console.log("Order created")
-            return true
-        }
-        return false;
-    }
-
-    addOrderToDict(order) {
-        this.activeOrder[order.orderId] = order;
-    }
-
-    removeOrderFromDict(order) {
-        if (order.orderId in this.activeOrder) {
-            delete this.activeOrder[order.id];
-            console.log("Order removed");
-        }
+    notifyDriver(driver, orders) {
+        orders.forEach(order => {
+            order.notifyDriver(driver)
+        });
     }
 }
 
