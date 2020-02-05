@@ -1,4 +1,5 @@
 const ActiveOrderDao = require('./ActiveOrderDao');
+const Driver = require('./Driver');
 
 class OrderProcessor {
     constructor(driverQuery) {
@@ -13,6 +14,7 @@ class OrderProcessor {
                 // Get the driver data
                 var driver = change.doc.data();
                 driver.driverId = change.doc.ref.id;
+                var driverObj=Driver(driver);
                 console.log(driver);
                 // Update the list based on driver status
                 if (driver.status === 'Available') {
@@ -65,8 +67,10 @@ class OrderProcessor {
         for (idx = 0; idx < this.activeDriver.length; idx++) {
             if (this.activeDriver[idx].driverId === driver.driverID) {
                 this.activeDriver.splice(idx, 1);
+                return true;
             }
         }
+        return false;
     }
 }
 
