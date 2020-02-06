@@ -29,11 +29,14 @@ app.post('/foodBank/placeOrder', (request, response) => {
 });
 
 /*****************Grocery Store EndPoint **********************/
-
 app.post('/groceryStore/sendUser', (request, response) => {
-    var userInfo = request.body;
+    var groceryUser = request.body;
     //TODO parse userInfo and register grocery store
-    groceryStores[userInfo.storeId] = userInfo; 
+    groceryStoreDao.writeGroceryStoreData(groceryUser.storeId,
+         groceryUser.companyName,
+         groceryUser.location,
+         groceryUser.storeNumber)
+
     response.status(200).send("Grocery Store Registered");
 });
 
@@ -51,7 +54,7 @@ app.post('/groceryStore/inventoryUpdate',(request, response) =>{
 //     var tempOrder = processor.getOrder(request.orderId);
 // });
 
-/*****************Grocery Store EndPoint **********************/
+/*****************Driver EndPoint **********************/
 
 app.post('/driver/driverStatusUpdate', (request, response) => {
     var orderId = request.body.orderId;
