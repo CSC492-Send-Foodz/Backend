@@ -11,14 +11,10 @@ const GroceryStoreDao = require('./GroceryStoreDao');
 admin.initializeApp(functions.config().firebase);
 var gsDB = admin.firestore();
 var groceryStores = {};
-var processor = new OrderProcessor();
-var groceryStoreService = new GroceryStoreService(groceryStores);
-var groceryStoreDao = new GroceryStoreDao(gsDB)
-
-var groceryStores = {};
 var driverQuery = gsDB.collection('driver');
 var processor = new OrderProcessor(driverQuery);
-var groceryStoreServ = new GroceryStoreService(groceryStores);
+var groceryStoreService = new GroceryStoreService(groceryStores);
+var groceryStoreDao = new GroceryStoreDao(gsDB);
 
 /*******************Food Bank EndPoint *************************/
 const app = express();
