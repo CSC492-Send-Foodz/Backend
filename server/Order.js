@@ -12,7 +12,6 @@ class Order {
 
         this.foodBankId = orderRef.foodBankId;
         this.groceryId = orderRef.groceryId;
-
         //this has been changed; this is a list
         this.inventoryItems = {} 
         
