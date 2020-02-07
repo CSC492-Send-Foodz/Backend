@@ -121,7 +121,7 @@ class Order {
     }
 
     notifyDrivers(potentialDrivers) { // push notification
-        if (potentialDrivers === undefined || potentialDrivers.length == 0) {
+        if (potentialDrivers === undefined || potentialDrivers.length === 0) {
             potentialDrivers.forEach(driver => {
                 console.log('Driver with id ' + driver.driverId + ' notified with for order' + this.orderId);
             });

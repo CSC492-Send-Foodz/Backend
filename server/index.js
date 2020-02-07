@@ -6,13 +6,13 @@ const OrderProcessor = require('./OrderProcessor');
 const GroceryStoreService = require('./GroceryStoreService');
 const EdiOrder = require('./EdiOrder');
 const GroceryStoreDao = require('./GroceryStoreDao');
-const ActiveOrdersDao = require('./ActiveOrdersDao');
+const ActiveOrdersDao = require('./ActiveOrderDao');
 
 // Initialize App
 admin.initializeApp(functions.config().firebase);
 var gsDB = admin.firestore();
 var groceryStores = {};
-var driverQuery = gsDB.collection('driver');
+var driverQuery = gsDB.collection('Driver');
 var activeOrdersDao = new ActiveOrdersDao();
 var processor = new OrderProcessor(driverQuery, activeOrdersDao);
 var groceryStoreService = new GroceryStoreService(groceryStores);

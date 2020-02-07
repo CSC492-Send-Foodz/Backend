@@ -6,7 +6,7 @@ class GroceryStoreDao {
     // for updating inventory in firestore
     newInventoryToGroceryStoreData(newEdiOrder){
         //write to the database new inventory
-        if(newEdiOrder.inventory === undefined || newEdiOrder.inventory.length == 0){
+        if(newEdiOrder.inventory === undefined || newEdiOrder.inventory.length === 0){
             console.log("Empty Order");
             return null;
         }
