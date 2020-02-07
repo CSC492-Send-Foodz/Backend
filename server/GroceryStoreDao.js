@@ -1,63 +1,35 @@
 class GroceryStoreDao{
-    constructor(){}
-
-    getGroceryStoreInventory(gsDB, order){
-        console.log("this is groceryId: ", order.groceryId);
-        let gsRef = gsDB.collection("GroceryStores").doc(order.groceryId).collection("InventoryCollection").doc("Items");
-        
-        gsRef.get().then(doc => {
-            if (!doc.exists){
-                console.log("No such document!");
-                return null;
-            }else{
-                console.log("This is doc data: ", doc.data());
-                //var jsonInfo = JSON.parse(JSON.stringify(doc.data()));
-                //console.log("This is jsonInfo:", jsonInfo);
-                return doc.data();
-            }
-        }).catch(err => {
-            console.log('Error getting document', err);
-            return null;
-        });
+    constructor(gsDB){
+        this.gsDB = gsDB;
     }
 
-    //order = order object
-    isOrderValid(gsDB, order){
-        //This is a 
-        var orderInventory = order.inventoryItems;
-        //console.log("This is order inventory:", orderInventory);
-
-        //compare quantities and update the quantity 
-        
-        //This is the path to firestore database
-        var groceryStoreInventory = this.getGroceryStoreInventory(gsDB, order);
-        console.log("this is groceryStoreInventory: FOR REAL", groceryStoreInventory);
-        
-        // item -> itemId , value -> item
-        for (const [item, value] of Object.entries(orderInventory)){ 
-            console.log("This is item", item);
-            console.log("This is value", value);      
-            if (value.getQuantity() > Number(groceryStoreInventory[value.getInventoryItemId()]["quantity"])){
+    isOrderValid(order){
+       var orderInventory = order.inventoryItems;
+       let gsRef = this.gsDB.collection("GroceryStores").doc(order.groceryId).collection("InventoryCollection").doc("Items");
+       gsRef.get().then(groceryStoreInventory =>{
+        for (const [itemId, item] of Object.entries(orderInventory)){
+            if (item.getQuantity() > Number(groceryStoreInventory.data()[item.getInventoryItemId()]["quantity"])){
                 order.setStatus("Invalid");
-                console.log("new updated status: ", order.getStatus());
-            }else{
-                order.setStatus("Looking for driver");
-                //console.log("new updated status: ",order.getStatus());
-                //get the remaining quantity in the database
-                var remainingQuantity =   Number(groceryStoreInventory[value.getInventoryItemId()]["quantity"]) - value.getQuantity();
-                console.log("remainingQuanitity: ", remainingQuantity);                 
-                this.updateStoreInventoryQuantity(gsRef, itemId, order); 
+                return false;
             }
-        
         }
-                                      
+         order.setStatus("Looking for driver");
+         this.updateStoreInventoryQuantity(gsRef, orderInventory, groceryStoreInventory.data()); 
+         return true;
+
+      })                  
     }
 
-    updateStoreInventoryQuantity(gsRef, itemId, order){
-        var ord = {};
-        ord[itemId] = {"ediOrderNumber": order, "expiryDate":expiryDate, "inventoryItemId":inventoryItemId, "name":name,"quantity": remainingQuantity};
-        console.log(ord);
-        gsRef.update(ord);
+    updateStoreInventoryQuantity(gsRef, orderInventory, groceryStoreInventory){
+        var updateItems = {};
+        for(const [itemId, item] of Object.entries(orderInventory)){
+            var remainingQuantity =  Number(groceryStoreInventory[itemId]["quantity"]) - value.getQuantity();
+            
+            ord[orderInventory[itemId].getInventoryItemId()] = {"ediOrderNumber": orderInventory[itemId].getEdiOrderNumber(), "expiryDate":orderInventory[itemId].getExpiryDate(),
+             "inventoryItemId":orderInventory[itemId].getInventoryItemId(), "name":orderInventory[itemId].getName(),"quantity": remainingQuantity};
+        }
+        console.log("Decrement Values: ", updateItems);
+        gsRef.update(updateItems);
     }
 }
 
