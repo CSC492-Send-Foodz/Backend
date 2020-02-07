@@ -1,84 +1,78 @@
-/* Order is observer of: Inventory
- *           observed by: Drivers
- */
+const OrderStates = {
+    LOOKING_FOR_DRIVER: "Looking For Diver",
+    UNABLE_TO_COMPLETE: "Order is unable to completed",
+    VALID: "Order is able to completed",
+    PICKUP_IN_PROGRESS: "Driver on the way to pick up inventory from the grocery store",
+    DROP_OFF_IN_PROGRESS: "Driver has picked up inventory from the grocery store.",
+    DELIVERED: "Driver has dropped off the inventory at the food bank",
+    INVALID: "Order is invalid"
+  };
 
 class Order {
 
     constructor(orderRef) {
-        this.orderId = orderRef.orderId
-
-        //changed name 
-        this.status = orderRef.status;
-
+        this.orderId;
         this.foodBankId = orderRef.foodBankId;
         this.groceryId = orderRef.groceryId;
-        //this has been changed; this is a list
-        this.inventoryItems = {} 
-        
-        this.parseItems(orderRef.inventory);
-        
-       
+        this.inventoryItems = {};
         this.timePlaced = Date(orderRef.time);
 
-        this.driverId = {};
+        this.parseItems(orderRef.inventory);
+        this.setStatus(orderRef.status)
     }
 
-    getOrderId(){
-        return this.orderId;
+    getOrderId() { return this.orderId; }
+
+    setOrderId(orderId) { this.orderId = orderId;}
+
+    setStatus(newStatus) { 
+        switch(newStatus){
+            case 'Looking For Diver':
+                this.status = OrderStates.LOOKING_FOR_DRIVER;
+                break;
+            case 'Unable To Complete':
+                this.status = OrderStates.UNABLE_TO_COMPLETE;
+                break;
+            case 'Valid':
+                this.status = OrderStates.VALID;
+                break;
+            case 'Pickup In Progress':
+                this.status = OrderStates.PICKUP_IN_PROGRESS;
+                break;
+            case 'Drop Off In Progress':
+                this.status = OrderStates.DROP_OFF_IN_PROGRESS;
+                break;
+            case 'Delivered':
+                this.status = OrderStates.DELIVERED;
+                break;
+            default:
+            this.status = OrderStates.INVALID;
+        }   
     }
 
-    setStatus(newStatus) {
-        this.status = newStatus;
-    }
+    getStatus() { return this.status; }
 
-    getStatus() {
-        return this.status;
-    }
+    setFoodBankId(foodBankId) { this.foodBankId = foodBankId; }
 
-    getDriver(driverId) {
-        return this.driverId[driverId];
-    }
+    getFoodBankId() { return this.foodBankId; }
 
-    setFoodBankId(foodBankId) {
-        this.foodBankId = foodBankId;
-    }
+    setGroceryId(groceryId) { this.groceryId = groceryId; }
 
-    getFoodBankId() {
-        return this.foodBankId;
-    }
+    getGroceryId() { return this.groceryId; }
 
-    setGroceryId(groceryId) {
-        this.groceryId = groceryId;
-    }
+    setTime(time) { this.timePlaced = time; }
 
-    getGroceryId() {
-        return this.groceryId;
-    }
+    getTime() { return this.timePlaced; }
 
-    setTime(time) {
-        this.timePlaced = time;
-    }
+    getItem(itemId) { return this.inventoryItems[itemId]; }
 
-    getTime() {
-        return this.timePlaced;
-    }
+    getInventory() { return this.inventoryItems; }
 
-    getItem(itemId) {
-        return this.inventoryItems[itemId];
-    }
-
-    //added because it wasn't available
-    getInventory(){
-        return this.inventoryItems;
-    }
-
-    parseItems(itemsList) { // who parses itemsJSON into Items?
+    parseItems(itemsList) {
         itemsList.forEach(item => {
             this.inventoryItems[item.inventoryItemId] = item
         });
     }
-
-    // Beginning of Observable's duties
     notifyFoodBank(foodBankURL) {
         try {
             // let fbServer = new XMLHttpRequest();
@@ -96,7 +90,7 @@ class Order {
             // }
 
             // fbServer.send();
-            console.log("200")
+            console.log("Food Bank Notified 200")
 
         } catch (error) {
             console.log("Can't notify entity.")
@@ -120,55 +114,22 @@ class Order {
             // }
 
             // gsServer.send();
-            console.log("200");
+            console.log("Grocery Store Notified 200");
         } catch (error) {
             console.log("Can't notify entity.")
         }
     }
 
-    notifyDrivers(context) { // push notification
-        if (this.driverId.length !== 0) {
-            this.driverId.forEach(driver => {
-                driver.messages = context;
+    notifyDrivers(potentialDrivers) { // push notification
+        if (potentialDrivers === undefined || potentialDrivers.length == 0) {
+            potentialDrivers.forEach(driver => {
+                console.log('Driver with id ' + driver.driverId + ' notified with for order' + this.orderId);
             });
-            console.log('Driver notified with ' + context);
         } else {
             console.log("Notification failed" + error);
         }
     }
-
-    addDriver(driver) { // adds observer
-        if (this.isDriverValid(driver)) {
-            this.driverId[driver.driverId] = driver;
-            console.log("Driver added.")
-        } else {
-            console.log("Can't assign driver" + error);
-        }
-    }
-
-    removeDriver(driverId) { // removes observer
-        if (driverId in this.driverId) {
-            delete this.driverId[driverId];
-            console.log("Driver" + driverId + " removed.");
-        } else {
-            console.log("Can't unsubscribe driver " + error);
-        }
-    }
-
-    isDriverValid(driver) {
-        //check if Driver instance has ID, name, reg. vehicle
-
-        return ((driver.id !== null) && driver.name !== undefined && driver.vehicle !== undefined);
-    }
-    // End of Observable duties
-
-    // Beginning of Observer duties
-    updateStatus(newStatus) {
-        // update properties in response to changes in Inventory
-        this.setProgressStatus(newStatus);
-    }
-
-    // End of Observer duties
 }
 
-module.exports = Order;
+module.exports =  Order;
+module.exports =  OrderStates;
