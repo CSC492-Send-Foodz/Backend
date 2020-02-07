@@ -93,7 +93,7 @@ class Order {
             console.log("Food Bank Notified 200")
 
         } catch (error) {
-            console.log("Can"t notify entity.")
+            console.log("Can\'t notify entity.")
         }
     }
 
