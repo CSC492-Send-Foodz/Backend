@@ -1,6 +1,6 @@
 
 /*This our observable; GSInventory will notify all orders when the store inventory
- * get's updated*/
+ * gets updated*/
 
 class GroceryStoreService {
 	constructor(emptyDict){

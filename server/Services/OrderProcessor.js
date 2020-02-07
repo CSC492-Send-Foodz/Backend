@@ -1,5 +1,5 @@
-const ActiveOrderDao = require('./ActiveOrderDao');
-const Driver = require('./Driver');
+const ActiveOrderDao = require("../DataAccessObjects/ActiveOrderDao");
+const Driver = require("../Models/Driver");
 
 class OrderProcessor {
     constructor(driverQuery, activeOrderDao) {
