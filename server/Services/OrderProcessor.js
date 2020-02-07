@@ -1,4 +1,5 @@
-const Driver = require('./Driver');
+const ActiveOrderDao = require("../DataAccessObjects/ActiveOrderDao");
+const Driver = require("../Models/Driver");
 
 class OrderProcessor {
     constructor(driverQuery, activeOrderDao, groceryStoreDao, driverDao) {
@@ -27,7 +28,7 @@ class OrderProcessor {
                 driver.driverId = change.doc.ref.id;
                 var driverObj = Driver(driver);
                 // Update the orders if the driver is Available
-                if (driver.status === 'Available') {
+                if (driver.status === Driver.driverStates.AVAILABLE) {
                     // Find orders that the driver can deliver and send
                     notifyDriver(driverObj, this.activeOrderDao.findMatchingActiveOrders(driverObj));
                 }

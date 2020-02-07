@@ -6,7 +6,7 @@ class ActiveOrdersDao {
 
     updateActiveOrderStatus(orderId, newStatus) {
         //get order from db using orderId
-        let orderRef = this.gsDB.collection('ActiveOrders').doc(String(orderId));
+        let orderRef = this.gsDB.collection("ActiveOrders").doc(String(orderId));
         //modify order status
         return orderRef.update({
             "status": newStatus
@@ -21,12 +21,12 @@ class ActiveOrdersDao {
     addToActiveOrders(order) {
         //write order to db; index by orderId
         let key = generateUniqueKey();
-        this.gsDB.ref('ActiveOrders/' + String(key)).set(order);
+        this.gsDB.ref("ActiveOrders/" + String(key)).set(order);
     }
 
     removeFromActiveOrders(orderId) {
         //get all documents with orderid
-        let orderRef = this.gsDB.collection('ActiveOrders').doc(String(orderId));
+        let orderRef = this.gsDB.collection("ActiveOrders").doc(String(orderId));
 
         orderRef.delete().then(() => {
                 console.log("Order " + orderId + "deleted");
@@ -39,18 +39,18 @@ class ActiveOrdersDao {
     findMatchingActiveOrders(driver) {
         let matchingOrders = [];
         let currCapacity = driver.getCapacity();
-        let ordersRef = this.gsDB.collection('ActiveOrders');
+        let ordersRef = this.gsDB.collection("ActiveOrders");
 
         ordersRef.get().then(snapshot => {
             snapshot.forEach(order => {
-                console.log(order.id, '=>', order.data());
+                console.log(order.id, "=>", order.data());
                 if (order.totalQuantity <= currCapacity) {
                     matchingOrders.push(order);
                 }
             });
         })
         .catch(err => {
-            console.log('Error getting active orders', err);
+            console.log("Error getting active orders", err);
         });
 
         return matchingOrders;
@@ -59,18 +59,18 @@ class ActiveOrdersDao {
     generateUniqueKey() {
         let dbKeys = [];
 
-        //get all keys in firebase and check they don't coincide with key
-        let ordersRef = this.gsDB.collection('ActiveOrders');
+        //get all keys in firebase and check they don"t coincide with key
+        let ordersRef = this.gsDB.collection("ActiveOrders");
         console.log(ordersRef);
         
         ordersRef.get().then(snapshot => {
                 snapshot.forEach(doc => {
-                    console.log(doc.id, '=>', doc.data());
+                    console.log(doc.id, "=>", doc.data());
                     dbKeys.push(doc.id);
                 });
             })
             .catch(err => {
-                console.log('Error getting documents', err);
+                console.log("Error getting documents", err);
             });
 
         return _getKeyUnique(dbKeys);

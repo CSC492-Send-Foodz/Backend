@@ -1,18 +1,21 @@
+// Firebase Imports
 const admin = require("firebase-admin");
-const functions = require('firebase-functions');
-const express = require('express');
-const Order = require('./Order');
-const OrderProcessor = require('./OrderProcessor');
-const GroceryStoreService = require('./GroceryStoreService');
-const EdiOrder = require('./EdiOrder');
-const GroceryStoreDao = require('./GroceryStoreDao');
-const ActiveOrdersDao = require('./ActiveOrdersDao');
+const functions = require("firebase-functions");
+// Endpoint Imports
+const express = require("express");
+// Other Imports
+const Order = require("./Models/Order");
+const OrderProcessor = require("./Services/OrderProcessor");
+const GroceryStoreService = require("./Services/GroceryStoreService");
+const EdiOrder = require("./Models/EdiOrder");
+const GroceryStoreDao = require("./DataAccessObjects/GroceryStoreDao");
+const ActiveOrdersDao = require("./DataAccessObjects/ActiveOrderDao");
 
 // Initialize App
 admin.initializeApp(functions.config().firebase);
 var gsDB = admin.firestore();
 var groceryStores = {};
-var driverQuery = gsDB.collection('driver');
+var driverQuery = gsDB.collection("Driver");
 var activeOrdersDao = new ActiveOrdersDao();
 var processor = new OrderProcessor(driverQuery, activeOrdersDao);
 var groceryStoreService = new GroceryStoreService(groceryStores);
@@ -21,7 +24,7 @@ var groceryStoreDao = new GroceryStoreDao(gsDB);
 /*******************Food Bank EndPoint *************************/
 const app = express();
 
-app.post('/foodBank/placeOrder', (request, response) => {
+app.post("/foodBank/placeOrder", (request, response) => {
     var body = request.body;
     let orderId = activeOrdersDao.generateUniqueKey();
     order = new Order(body);
@@ -35,11 +38,10 @@ app.post('/foodBank/placeOrder', (request, response) => {
 });
 
 /*****************Grocery Store EndPoint **********************/
-app.post('/groceryStore/sendUser', (request, response) => {
+app.post("/groceryStore/sendUser", (request, response) => {
     var groceryUser = request.body;
     //TODO parse userInfo and register grocery store
-    groceryStoreDao.writeGroceryStoreData(groceryUser.storeId,
-         groceryUser.companyName,
+    groceryStoreDao.writeGroceryStoreData(groceryUser.companyName,
          groceryUser.location,
          groceryUser.storeNumber)
 
@@ -47,7 +49,7 @@ app.post('/groceryStore/sendUser', (request, response) => {
 });
 
 //Update inventory of a store
-app.post('/groceryStore/inventoryUpdate',(request, response) =>{
+app.post("/groceryStore/inventoryUpdate",(request, response) =>{
     //receive data body that is an inventory from single grocery store
     var jsonBody = request.body; 
     var newEdiOrder = new EdiOrder(jsonBody);
@@ -56,13 +58,13 @@ app.post('/groceryStore/inventoryUpdate',(request, response) =>{
 });
 
 // //verify order has been picked up 
-// groceryStoreFunctions.post('/orderPickedUp/:orderId', (request, response) =>{
+// groceryStoreFunctions.post("/orderPickedUp/:orderId", (request, response) =>{
 //     var tempOrder = processor.getOrder(request.orderId);
 // });
 
 /*****************Driver EndPoint **********************/
 
-app.post('/driver/driverStatusUpdate', (request, response) => {
+app.post("/driver/driverStatusUpdate", (request, response) => {
     var orderId = request.body.orderId;
     var driverId = request.body.driverId;
     var updateDriverStatus = request.body.updateDriverStatus;

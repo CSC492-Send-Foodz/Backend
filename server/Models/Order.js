@@ -27,22 +27,22 @@ class Order {
 
     setStatus(newStatus) { 
         switch(newStatus){
-            case 'Looking For Diver':
+            case "Looking For Diver":
                 this.status = OrderStates.LOOKING_FOR_DRIVER;
                 break;
-            case 'Unable To Complete':
+            case "Unable To Complete":
                 this.status = OrderStates.UNABLE_TO_COMPLETE;
                 break;
-            case 'Valid':
+            case "Valid":
                 this.status = OrderStates.VALID;
                 break;
-            case 'Pickup In Progress':
+            case "Pickup In Progress":
                 this.status = OrderStates.PICKUP_IN_PROGRESS;
                 break;
-            case 'Drop Off In Progress':
+            case "Drop Off In Progress":
                 this.status = OrderStates.DROP_OFF_IN_PROGRESS;
                 break;
-            case 'Delivered':
+            case "Delivered":
                 this.status = OrderStates.DELIVERED;
                 break;
             default:
@@ -77,7 +77,7 @@ class Order {
         try {
             // let fbServer = new XMLHttpRequest();
             // fbServer.open("POST", foodBankURL, true);
-            // fbServer.setRequestHeader('Content-Type', 'application/json');
+            // fbServer.setRequestHeader("Content-Type", "application/json");
             // fbServer.send(JSON.stringify({
             //     "orderId": this.orderId,
             //     "status": this.progressStatus
@@ -101,7 +101,7 @@ class Order {
         try {
             // let gsServer = new XMLHttpRequest();
             // gsServer.open("POST", groceryStoreURL, true);
-            // gsServer.setRequestHeader('Content-Type', 'application/json');
+            // gsServer.setRequestHeader("Content-Type", "application/json");
             // gsServer.send(JSON.stringify({
             //     "orderId": this.orderId,
             //     "status": this.progressStatus
@@ -116,14 +116,14 @@ class Order {
             // gsServer.send();
             console.log("Grocery Store Notified 200");
         } catch (error) {
-            console.log("Can't notify entity.")
+            console.log("Can\t notify entity.")
         }
     }
 
     notifyDrivers(potentialDrivers) { // push notification
-        if (potentialDrivers === undefined || potentialDrivers.length == 0) {
+        if (potentialDrivers === undefined || potentialDrivers.length === 0) {
             potentialDrivers.forEach(driver => {
-                console.log('Driver with id ' + driver.driverId + ' notified with for order' + this.orderId);
+                console.log("Driver with id " + driver.driverId + " notified with for order" + this.orderId);
             });
         } else {
             console.log("Notification failed" + error);
