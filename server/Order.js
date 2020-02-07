@@ -5,7 +5,7 @@
 class Order {
 
     constructor(orderRef) {
-        this.orderId = orderRef.orderId
+        this.orderId;
         this.status = orderRef.status;
         this.foodBankId = orderRef.foodBankId;
         this.groceryId = orderRef.groceryId;
@@ -18,6 +18,8 @@ class Order {
     }
 
     getOrderId() { return this.orderId; }
+    
+    setOrderId(orderId) { this.orderId = orderId;}
 
     setStatus(newStatus) { this.status = newStatus; }
 
@@ -92,7 +94,7 @@ class Order {
     }
 
     notifyDrivers(potentialDrivers) { // push notification
-        if (potentialDrivers === undefined || potentialDrivers.length == 0) {
+        if (potentialDrivers === undefined || potentialDrivers.length === 0) {
             potentialDrivers.forEach(driver => {
                 console.log('Driver with id ' + driver.driverId + ' notified with for order' + this.orderId);
             });
