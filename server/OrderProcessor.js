@@ -1,7 +1,8 @@
 class OrderProcessor {
-    constructor() {
+    constructor(activeOrderDao) {
         this.activeOrder = {};
         this.activeDriver = {};
+        this.activeOrderDao = activeOrderDao;
     }
 
     getOrder(orderId){
