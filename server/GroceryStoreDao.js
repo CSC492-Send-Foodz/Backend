@@ -17,7 +17,7 @@ class GroceryStoreDao{
          this.updateStoreInventoryQuantity(gsRef, orderInventory, groceryStoreInventory.data()); 
          return true;
 
-      })                  
+      });                  
     }
 
     updateStoreInventoryQuantity(gsRef, orderInventory, groceryStoreInventory){

@@ -1,6 +1,7 @@
 /* Order is observer of: Inventory
  *           observed by: Drivers
  */
+const Item = require('./Item');
 
 class Order {
 
@@ -13,7 +14,7 @@ class Order {
         this.foodBankId = orderRef.foodBankId;
         this.groceryId = orderRef.groceryId;
         //this has been changed; this is a list
-        this.inventoryItems = {} 
+        this.inventoryItems = {};
         
         this.parseItems(orderRef.inventory);
         
@@ -21,6 +22,22 @@ class Order {
         this.timePlaced = Date(orderRef.time);
 
         this.driverId = {};
+
+        this.totalQuantity = this.parseTotalQuantity(orderRef.inventory);
+    }
+
+
+    parseTotalQuantity(inventory){
+        var total = 0;
+        inventory.forEach(item => {
+            total += inventory[item]["quantity"];
+        });
+        return total;
+    }
+
+
+    getTotalQuantity(){
+        return this.totalQuantity;
     }
 
     getOrderId(){
@@ -74,8 +91,9 @@ class Order {
 
     parseItems(itemsList) { // who parses itemsJSON into Items?
         itemsList.forEach(item => {
-            this.inventoryItems[item.inventoryItemId] = item
+            this.inventoryItems[item.inventoryItemId] = new Item(item);
         });
+        //console.log("This is inventoryItem: ", this.inventoryItems);
     }
 
     // Beginning of Observable's duties
