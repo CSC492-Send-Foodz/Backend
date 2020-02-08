@@ -6,6 +6,7 @@ const OrderProcessor = require('./OrderProcessor');
 const GroceryStoreService = require('./GroceryStoreService');
 const EdiOrder = require('./EdiOrder');
 const GroceryStoreDao = require('./GroceryStoreDao');
+const DriverDao = require('./DriverDao');
 var groceryStores = {};
 var processor = new OrderProcessor();
 var groceryStoreServ = new GroceryStoreService(groceryStores);
@@ -84,6 +85,45 @@ groceryStoreFunctions.post('/orderPickedUp/:orderId', (request, response) =>{
     //New function here: query active order with specific id in the database
     decrementInventoryFromGroceryStoreData();
 });
+
+//Test data for Driver Collection
+
+let data1 = {
+    driverId: 3948,
+    capacity: 20,
+    status: "Available",
+    points: 1000,
+    defaultLocation: null,
+    completedOrderIds: [1234]
+};
+
+let setDoc1 = gsDB.collection('DriverCollection').doc('Driver').set(data1);
+
+
+let data2 = {
+    driverId: 5148,
+    capacity: 50,
+    status: "Pick Up in Progress",
+    points: 0,
+    defaultLocation: null,
+    completedOrderIds: []
+};
+
+let setDoc = gsDB.collection('DriverCollection').doc('Driver2').set(data2);
+
+
+//Post request to test for finding all valid drivers in DriverDao
+groceryStoreFunctions.post('/findAllDrivers', (request, response) => {
+    
+    var order = new Order(request.body);
+    var drDao = new DriverDao();
+    var allValidDrivers = drDao.findAllValidDrivers(gsDB, order);
+
+    console.log("This are all valid drivers from querying:", allValidDrivers);
+});
+
+
+
 
 exports.groceryStore = functions.https.onRequest(groceryStoreFunctions);
 

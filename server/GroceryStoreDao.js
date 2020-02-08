@@ -13,9 +13,9 @@ class GroceryStoreDao{
                 return false;
             }
         }
-         order.setStatus("Looking for driver");
-         this.updateStoreInventoryQuantity(gsRef, orderInventory, groceryStoreInventory.data()); 
-         return true;
+        order.setStatus("Looking for driver");
+        this.updateStoreInventoryQuantity(gsRef, orderInventory, groceryStoreInventory.data()); 
+        return true;
 
       });                  
     }
