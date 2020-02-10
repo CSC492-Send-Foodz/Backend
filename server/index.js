@@ -17,9 +17,10 @@ var gsDB = admin.firestore();
 var groceryStores = {};
 var driverQuery = gsDB.collection("Driver");
 var activeOrdersDao = new ActiveOrderDao.ActiveOrderDao(gsDB);
-var processor = new OrderProcessor.OrderProcessor(driverQuery, activeOrdersDao);
-var groceryStoreService = new GroceryStoreService.GroceryStoreService(groceryStores);
 var groceryStoreDao = new GroceryStoreDao.GroceryStoreDao(gsDB);
+// --- TODO Change null values when they are needed --- 
+var processor = new OrderProcessor.OrderProcessor(driverQuery, null, null, activeOrdersDao,groceryStoreDao);
+var groceryStoreService = new GroceryStoreService.GroceryStoreService(groceryStores);
 
 /*******************Food Bank EndPoint *************************/
 const app = express();

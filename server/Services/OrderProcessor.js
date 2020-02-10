@@ -5,19 +5,21 @@ const GroceryStoreDao = require("../DataAccessObjects/GroceryStoreDao");
 class OrderProcessor {
     constructor(driverQuery, orderQuery, groceryQuery, activeOrderDao, groceryStoreDao, driverDao) {
         this.initDriverListener(driverQuery);
-        this.initOrderListener(orderQuery, groceryQuery)
+        //this.initOrderListener(orderQuery, groceryQuery)
         this.activeOrderDao = activeOrderDao;
         this.groceryStoreDao = groceryStoreDao;
         this.driverDao = driverDao;
-    } 
+    }
 
     processOrder(order) {
         if (this.groceryStoreDao.isOrderValid(order)) {
-            let validDrivers = this.driverDao.findAllValidDrivers(order);
-            order.notifyDriver(validDrivers);
+            let validDriversId = this.driverDao.findAllValidDrivers(order);
+            order.notifyDrivers(validDriversId);
             this.activeOrderDao.addToActiveOrders(order);
+            return true;
         } else {
             console.log("Order is invalid");
+            return false;
         }
     }
 
@@ -37,22 +39,24 @@ class OrderProcessor {
             });
         });
     }
-    initOrderListener(orderQuery, groceryQuery){
+    /*
+    initOrderListener(orderQuery, groceryQuery) {
         let orderobserver = orderQuery.onSnapshot(snapshot => {
             let listener = snapshot.docChanges();
             listener.forEach(element => {
-                console.log(element.doc.data().status)
-                if (element.doc.data().status == 'Looking For Driver') {
-                    groceryQuery.get().then(function(doc){
-                        if(doc.exists){
+                var data = element.doc.data();
+                console.log(data.status);
+                if (data.status === 'Looking For Driver') {
+                    groceryQuery.get().then(function (doc) {
+                        if (doc.exists) {
                             console.log(doc.data().quantity);
-                            var quantity = doc.data()[element.doc.data().inventory['productId']]['quantity'] - element.doc.data().inventory['quantity'];
+                            var quantity = doc.data()[data.inventory['productId']]['quantity'] - data.inventory['quantity'];
                             var gs = GroceryStoreDao();
-                            gs.updateGroceryStoreData(element.doc.data().storeID, element.doc.data().inventory['productId'], quantity)
-                        }else{
+                            gs.updateGroceryStoreData(data.storeID, data.inventory['productId'], quantity)
+                        } else {
                             console.log('doc does not exists');
                         }
-                    }).catch(function(error){
+                    }).catch(function (error) {
                         console.log('caught error', error);
                     });
                 } else if (element.doc.data().status == 'In Progress') {
@@ -65,8 +69,7 @@ class OrderProcessor {
             });
         });
     }
-
-
+    */
 
     notifyDriver(driver, orders) {
         orders.forEach(order => {

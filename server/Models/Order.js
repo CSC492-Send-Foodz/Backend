@@ -120,10 +120,11 @@ class Order {
         }
     }
 
-    notifyDrivers(potentialDrivers) { // push notification
-        if (potentialDrivers === undefined || potentialDrivers.length === 0) {
-            potentialDrivers.forEach(driver => {
-                console.log("Driver with id " + driver.driverId + " notified with for order" + this.orderId);
+    // Push notifications based on an array of Driver IDs
+    notifyDrivers(potentialDrivers) {
+        if (potentialDrivers !== undefined && potentialDrivers.length !== 0) {
+            potentialDrivers.forEach(driverId => {
+                console.log("Driver with id " + driverId + " notified with for order" + this.orderId);
             });
         } else {
             console.log("Notification failed" + error);
