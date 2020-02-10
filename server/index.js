@@ -111,19 +111,13 @@ let data2 = {
 
 let setDoc = gsDB.collection('DriverCollection').doc('Driver2').set(data2);
 
-
 //Post request to test for finding all valid drivers in DriverDao
 groceryStoreFunctions.post('/findAllDrivers', (request, response) => {
     
     var order = new Order(request.body);
     var drDao = new DriverDao();
-    var allValidDrivers = drDao.findAllValidDrivers(gsDB, order);
-
-    console.log("This are all valid drivers from querying:", allValidDrivers);
+    drDao.notifyAllValidDrivers(gsDB, order);
 });
-
-
-
 
 exports.groceryStore = functions.https.onRequest(groceryStoreFunctions);
 
