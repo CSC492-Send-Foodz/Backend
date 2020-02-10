@@ -126,12 +126,11 @@ class Order {
         }
     }
 
-    notifyDrivers(context) { // push notification
-        if (this.driverId.length !== 0) {
-            this.driverId.forEach(driver => {
-                driver.messages = context;
+    notifyDrivers(driverIds) { // push notification
+        if (driverIds.length !== 0) {
+            driverIds.forEach(driverId => {
+                console.log('Notified Driver ' + driverId + ' for order ' + this.orderId);
             });
-            console.log('Driver notified with ' + context);
         } else {
             console.log("Notification failed" + error);
         }
