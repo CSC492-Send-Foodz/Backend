@@ -76,6 +76,7 @@ class Order {
     getInventory() { return this.inventoryItems; }
 
     parseItems(itemsList) {
+        console.log(itemsList);
         itemsList.forEach(item => {
             this.inventoryItems[item.inventoryItemId] = new Item.Item(item, this.ediOrderNumber)
             this.totalQuantity += Number(item.quantity); 

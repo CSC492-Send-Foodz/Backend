@@ -22,7 +22,7 @@ var groceryStoreDao = new GroceryStoreDao.GroceryStoreDao(gsDB);
 var driverDao = new DriverDao.DriverDao(gsDB);
 
 // --- TODO Change null values when they are needed --- 
-var processor = new OrderProcessor.OrderProcessor(driverQuery, null, null, activeOrdersDao, groceryStoreDao, driverDao);
+var processor = new OrderProcessor.OrderProcessor(gsDB, activeOrdersDao, groceryStoreDao, driverDao);
 var groceryStoreService = new GroceryStoreService.GroceryStoreService(groceryStores);
 
 /*******************Food Bank EndPoint *************************/

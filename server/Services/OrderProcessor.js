@@ -1,19 +1,22 @@
 const ActiveOrderDao = require("../DataAccessObjects/ActiveOrderDao");
 const Driver = require("../Models/Driver");
 const GroceryStoreDao = require("../DataAccessObjects/GroceryStoreDao");
+const Order = require("../Models/Order");
 
 class OrderProcessor {
-    constructor(driverQuery, orderQuery, groceryQuery, activeOrderDao, groceryStoreDao, driverDao) {
-        this.initDriverListener(driverQuery);
-        //this.initOrderListener(orderQuery, groceryQuery)
+    constructor(gsDB, activeOrderDao, groceryStoreDao, driverDao) {
+        var driverQuery = gsDB.collection("Driver");
+        var orderQuery = gsDB.collection("ActiveOrders");
         this.activeOrderDao = activeOrderDao;
         this.groceryStoreDao = groceryStoreDao;
         this.driverDao = driverDao;
+        this.initDriverListener(driverQuery);
+        this.initOrderListener(orderQuery);
     }
 
     processOrder(order) {
         this.groceryStoreDao.isOrderValid(order).then(res => {
-            if(res){
+            if (res) {
                 this.driverDao.notifyAllValidDrivers(order);
                 this.activeOrderDao.addToActiveOrders(order);
                 return true;
@@ -21,16 +24,6 @@ class OrderProcessor {
             console.log("Order is invalid");
             return false;
         });
-
-
-        // if (this.groceryStoreDao.isOrderValid(order)) {
-        //     this.driverDao.notifyAllValidDrivers(order);
-        //     this.activeOrderDao.addToActiveOrders(order);
-        //     return true;
-        // } else {
-        //     console.log("Order is invalid");
-        //     return false;
-        // }
     }
 
     initDriverListener(driverQuery) {
@@ -49,26 +42,15 @@ class OrderProcessor {
             });
         });
     }
-    /*
-    initOrderListener(orderQuery, groceryQuery) {
-        let orderobserver = orderQuery.onSnapshot(snapshot => {
+
+    initOrderListener(orderQuery) {
+        orderQuery.onSnapshot(snapshot => {
             let listener = snapshot.docChanges();
             listener.forEach(element => {
-                var data = element.doc.data();
-                console.log(data.status);
-                if (data.status === 'Looking For Driver') {
-                    groceryQuery.get().then(function (doc) {
-                        if (doc.exists) {
-                            console.log(doc.data().quantity);
-                            var quantity = doc.data()[data.inventory['productId']]['quantity'] - data.inventory['quantity'];
-                            var gs = GroceryStoreDao();
-                            gs.updateGroceryStoreData(data.storeID, data.inventory['productId'], quantity)
-                        } else {
-                            console.log('doc does not exists');
-                        }
-                    }).catch(function (error) {
-                        console.log('caught error', error);
-                    });
+                var order = new Order.Order(element.doc.data());
+                console.log(element.doc.data().status)
+                if (element.doc.data().status == 'Looking For Driver') {
+                    this.driverDao.notifyAllValidDrivers(order)
                 } else if (element.doc.data().status == 'In Progress') {
                     console.log('Advanced Shipping Notice - drivers')
                     console.log('Advanced Shipping Notice - grocery')
@@ -79,7 +61,7 @@ class OrderProcessor {
             });
         });
     }
-    */
+
 
     notifyDriver(driver, orders) {
         orders.forEach(order => {
