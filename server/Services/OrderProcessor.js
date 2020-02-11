@@ -13,8 +13,8 @@ class OrderProcessor {
 
     processOrder(order) {
         if (this.groceryStoreDao.isOrderValid(order)) {
-            let validDriversId = this.driverDao.findAllValidDrivers(order);
-            order.notifyDrivers(validDriversId);
+            
+            this.driverDao.notifyAllValidDrivers(order);
             this.activeOrderDao.addToActiveOrders(order);
             return true;
         } else {
