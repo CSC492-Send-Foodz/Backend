@@ -35,7 +35,6 @@ app.post("/foodBank/placeOrder", (request, response) => {
     order.setOrderId(orderId);
     processor.processOrder(order, groceryStoreService);
     response.status(200).send("Order Received");
-    //write to firestore database
 });
 
 /*****************Grocery Store EndPoint **********************/
@@ -57,11 +56,6 @@ app.post("/groceryStore/inventoryUpdate", (request, response) => {
     groceryStoreDao.newInventoryToGroceryStoreData(newEdiOrder);
     response.status(200).send("Inventory updated in Firestore");
 });
-
-// //verify order has been picked up 
-// groceryStoreFunctions.post("/orderPickedUp/:orderId", (request, response) =>{
-//     var tempOrder = processor.getOrder(request.orderId);
-// });
 
 /*****************Driver EndPoint **********************/
 

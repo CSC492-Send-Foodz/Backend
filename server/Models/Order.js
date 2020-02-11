@@ -22,7 +22,7 @@ class Order {
         this.driverId = {};  
         this.ediOrderNumber = orderRef.ediOrderNumber;
 
-        this.parseItems(orderRef.inventory);
+        this.parseItems(orderRef.inventoryItems);
         this.setStatus(orderRef.status)
     }
 
@@ -75,12 +75,12 @@ class Order {
 
     getInventory() { return this.inventoryItems; }
 
-    parseItems(itemsList) {
-        console.log(itemsList);
-        itemsList.forEach(item => {
-            this.inventoryItems[item.inventoryItemId] = new Item.Item(item, this.ediOrderNumber)
+    parseItems(inventoryItemsRef) {
+
+        for (const [itemId, item] of Object.entries(inventoryItemsRef)){
+            this.inventoryItems[itemId] = new Item.Item(item, this.ediOrderNumber)
             this.totalQuantity += Number(item.quantity); 
-        });
+        }
     }
     notifyFoodBank(foodBankURL) {
         console.log("Food Bank Notified 200")

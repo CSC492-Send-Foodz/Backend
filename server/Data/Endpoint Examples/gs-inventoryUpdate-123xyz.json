@@ -1,18 +1,20 @@
 {
     "ediOrderNumber": "123xyz",
     "groceryId": 1,
-    "inventory": [
-        {
+    "inventory": {
+        "333": {
             "inventoryItemId": 333,
             "name": "Orange",
             "quantity": 20,
-            "expiryDate": "20-03-28"
+            "expiryDate": "20-03-28",
+            "groceryStoreId": 1
         },
-        {
+        "334": {
             "inventoryItemId": 334,
             "name": "Apple",
             "quantity": 20,
-            "expiryDate": "20-03-20"
+            "expiryDate": "20-03-20",
+            "groceryStoreId": 1
         }
-    ]
+    }
 }

@@ -34,7 +34,6 @@ class OrderProcessor {
                 var driver = change.doc.data();
                 driver.driverId = change.doc.ref.id;
                 var driverObj = Driver(driver);
-                // Update the orders if the driver is Available
                 if (driver.status === Driver.driverStates.AVAILABLE) {
                     // Find orders that the driver can deliver and send
                     notifyDriver(driverObj, this.activeOrderDao.findMatchingActiveOrders(driverObj));
@@ -48,6 +47,7 @@ class OrderProcessor {
             let listener = snapshot.docChanges();
             listener.forEach(element => {
                 var order = new Order.Order(element.doc.data());
+                order.setOrderId(element.doc.data().orderId);
                 console.log(element.doc.data().status)
                 if (element.doc.data().status == 'Looking For Driver') {
                     this.driverDao.notifyAllValidDrivers(order)
