@@ -20,8 +20,11 @@ class ActiveOrderDao {
 
     addToActiveOrders(order) {
         //write order to db; index by orderId
-        let key = generateUniqueKey();
-        this.gsDB.ref("ActiveOrders/" + String(key)).set(order);
+        var jsonOrder = JSON.parse(JSON.stringify(order));
+        let key = this.generateUniqueKey();
+        this.gsDB.collection("ActiveOrders").doc(`${key}`).set(
+            jsonOrder
+        );
     }
 
     removeFromActiveOrders(orderId) {
@@ -61,11 +64,9 @@ class ActiveOrderDao {
 
         //get all keys in firebase and check they don"t coincide with key
         let ordersRef = this.gsDB.collection("ActiveOrders");
-        console.log(ordersRef);
 
         ordersRef.get().then(snapshot => {
             snapshot.forEach(doc => {
-                console.log(doc.id, "=>", doc.data());
                 dbKeys.push(doc.id);
             });
         })
@@ -83,7 +84,6 @@ class ActiveOrderDao {
         if (listOfKeys.includes(key)) {
             return this._getKeyUnique(listOfKeys);
         } else {
-            console.log(key);
             return key;
         }
     }

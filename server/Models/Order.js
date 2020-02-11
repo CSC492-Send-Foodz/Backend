@@ -1,3 +1,5 @@
+const Item = require("./Item");
+
 const OrderStates = {
     LOOKING_FOR_DRIVER: "Looking For Diver",
     UNABLE_TO_COMPLETE: "Order is unable to completed",
@@ -18,6 +20,7 @@ class Order {
         this.timePlaced = Date(orderRef.time);
         this.totalQuantity = 0;
         this.driverId = {};  
+        this.ediOrderNumber = orderRef.ediOrderNumber;
 
         this.parseItems(orderRef.inventory);
         this.setStatus(orderRef.status)
@@ -74,7 +77,7 @@ class Order {
 
     parseItems(itemsList) {
         itemsList.forEach(item => {
-            this.inventoryItems[item.inventoryItemId] = item
+            this.inventoryItems[item.inventoryItemId] = new Item.Item(item, this.ediOrderNumber)
             this.totalQuantity += Number(item.quantity); 
         });
     }

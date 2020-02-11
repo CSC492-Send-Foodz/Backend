@@ -12,20 +12,30 @@ class OrderProcessor {
     }
 
     processOrder(order) {
-        if (this.groceryStoreDao.isOrderValid(order)) {
-            
-            this.driverDao.notifyAllValidDrivers(order);
-            this.activeOrderDao.addToActiveOrders(order);
-            return true;
-        } else {
+        this.groceryStoreDao.isOrderValid(order).then(res => {
+            if(res){
+                this.driverDao.notifyAllValidDrivers(order);
+                this.activeOrderDao.addToActiveOrders(order);
+                return true;
+            }
             console.log("Order is invalid");
             return false;
-        }
+        });
+
+
+        // if (this.groceryStoreDao.isOrderValid(order)) {
+        //     this.driverDao.notifyAllValidDrivers(order);
+        //     this.activeOrderDao.addToActiveOrders(order);
+        //     return true;
+        // } else {
+        //     console.log("Order is invalid");
+        //     return false;
+        // }
     }
 
     initDriverListener(driverQuery) {
         // Construct a listener for driver statuses
-        let observer = driverQuery.onSnapshot(querySnapshot => {
+        driverQuery.onSnapshot(querySnapshot => {
             querySnapshot.docChanges().forEach(change => {
                 // Get the driver data
                 var driver = change.doc.data();

@@ -1,10 +1,11 @@
 class DriverDao {
 
-    constructor() {
+    constructor(gsDB) {
+        this.gsDB = gsDB;
     }
 
-    notifyAllValidDrivers(dDB, activeOrder) {
-        let driverDatabase = dDB.collection("DriverCollection");
+    notifyAllValidDrivers(activeOrder) {
+        let driverDatabase = this.gsDB.collection("DriverCollection");
         driverDatabase.where('capacity', '>=', activeOrder.getTotalQuantity()).get().then(snapshot => {
             var driverIds = [];
             snapshot.forEach(doc => {

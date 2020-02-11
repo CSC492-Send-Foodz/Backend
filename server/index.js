@@ -10,6 +10,7 @@ const GroceryStoreService = require("./Services/GroceryStoreService");
 const EdiOrder = require("./Models/EdiOrder");
 const GroceryStoreDao = require("./DataAccessObjects/GroceryStoreDao");
 const ActiveOrderDao = require("./DataAccessObjects/ActiveOrderDao");
+const DriverDao = require("./DataAccessObjects/DriverDao");
 
 // Initialize App
 admin.initializeApp(functions.config().firebase);
@@ -18,8 +19,10 @@ var groceryStores = {};
 var driverQuery = gsDB.collection("Driver");
 var activeOrdersDao = new ActiveOrderDao.ActiveOrderDao(gsDB);
 var groceryStoreDao = new GroceryStoreDao.GroceryStoreDao(gsDB);
+var driverDao = new DriverDao.DriverDao(gsDB);
+
 // --- TODO Change null values when they are needed --- 
-var processor = new OrderProcessor.OrderProcessor(driverQuery, null, null, activeOrdersDao,groceryStoreDao);
+var processor = new OrderProcessor.OrderProcessor(driverQuery, null, null, activeOrdersDao, groceryStoreDao, driverDao);
 var groceryStoreService = new GroceryStoreService.GroceryStoreService(groceryStores);
 
 /*******************Food Bank EndPoint *************************/
@@ -29,12 +32,9 @@ app.post("/foodBank/placeOrder", (request, response) => {
     var body = request.body;
     let orderId = activeOrdersDao.generateUniqueKey();
     order = new Order.Order(body);
-
     order.setOrderId(orderId);
-    //---TODO - Double check if this works!!---
-    if (processor.processOrder(order, groceryStoreService)) {
-        response.status(200).send("Order Received");
-    }
+    processor.processOrder(order, groceryStoreService);
+    response.status(200).send("Order Received");
     //write to firestore database
 });
 
