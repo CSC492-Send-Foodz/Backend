@@ -1,7 +1,7 @@
 {
     "ediOrderNumber": "123xyz",
-    "groceryId": 1,
-    "inventory": {
+    "groceryId": 3229,
+    "inventoryItems": {
         "333": {
             "inventoryItemId": 333,
             "name": "Orange",

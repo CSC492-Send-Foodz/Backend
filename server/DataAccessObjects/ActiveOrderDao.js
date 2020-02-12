@@ -1,4 +1,5 @@
 /* eslint-disable promise/always-return */
+const Order = require("../Models/Order");
 class ActiveOrderDao {
     constructor(gsDB) {
         this.gsDB = gsDB;
@@ -16,6 +17,7 @@ class ActiveOrderDao {
         }).then(() => {
             console.log("Active order" + orderId + " status updated")
         });
+
     }
 
     addToActiveOrders(order) {
@@ -40,23 +42,18 @@ class ActiveOrderDao {
     }
 
     findMatchingActiveOrders(driver) {
-        let matchingOrders = [];
         let currCapacity = driver.getCapacity();
         let ordersRef = this.gsDB.collection("ActiveOrders");
-
         ordersRef.get().then(snapshot => {
-            snapshot.forEach(order => {
-                console.log(order.id, "=>", order.data());
-                if (order.totalQuantity <= currCapacity) {
-                    matchingOrders.push(order);
+            snapshot.docs.forEach(order => {
+                if (order.data().totalQuantity <= currCapacity) {
+                    new Order.Order(order.data()).notifyDriver(driver.getDriverId())
                 }
             });
         })
             .catch(err => {
                 console.log("Error getting active orders", err);
             });
-
-        return matchingOrders;
     }
 
     generateUniqueKey() {

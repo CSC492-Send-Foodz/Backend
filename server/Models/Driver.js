@@ -22,16 +22,16 @@ class Driver {
 
     setDriverStatus(newStatus) {
         switch (newStatus) {
-            case "Available":
+            case "Driver available to deliever an order":
                 this.status = DriverStates.AVAILABLE;
                 break;
-            case "Accepted":
+            case "Driver has accepted order":
                 this.status = DriverStates.ACCEPTED;
                 break;
-            case "Rejected":
+            case "Driver has rejected order":
                 this.status = DriverStates.REJECTED;
                 break;
-            case "Cancelled":
+            case "Driver has cancelled order":
                 this.status = DriverStates.CANCELLED;
                 break;
         }

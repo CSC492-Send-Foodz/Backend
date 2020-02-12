@@ -16,12 +16,10 @@ const DriverDao = require("./DataAccessObjects/DriverDao");
 admin.initializeApp(functions.config().firebase);
 var gsDB = admin.firestore();
 var groceryStores = {};
-var driverQuery = gsDB.collection("Driver");
 var activeOrdersDao = new ActiveOrderDao.ActiveOrderDao(gsDB);
 var groceryStoreDao = new GroceryStoreDao.GroceryStoreDao(gsDB);
 var driverDao = new DriverDao.DriverDao(gsDB);
 
-// --- TODO Change null values when they are needed --- 
 var processor = new OrderProcessor.OrderProcessor(gsDB, activeOrdersDao, groceryStoreDao, driverDao);
 var groceryStoreService = new GroceryStoreService.GroceryStoreService(groceryStores);
 
@@ -33,6 +31,7 @@ app.post("/foodBank/placeOrder", (request, response) => {
     let orderId = activeOrdersDao.generateUniqueKey();
     order = new Order.Order(body);
     order.setOrderId(orderId);
+    console.log("Order received and instance created with unique id: " + order.getOrderId())
     processor.processOrder(order, groceryStoreService);
     response.status(200).send("Order Received");
 });
@@ -41,7 +40,9 @@ app.post("/foodBank/placeOrder", (request, response) => {
 app.post("/groceryStore/sendUser", (request, response) => {
     var groceryUser = request.body;
     //TODO parse userInfo and register grocery store
-    groceryStoreDao.writeGroceryStoreData(groceryUser.companyName,
+    console.log(groceryUser.companyName)
+    groceryStoreDao.writeGroceryStoreData(
+        groceryUser.companyName,
         groceryUser.location,
         groceryUser.storeNumber)
 
@@ -67,6 +68,7 @@ app.post("/driver/driverStatusUpdate", (request, response) => {
     response.status(200).send("Driver Id: " + driverId +
         "\n New Status: " + updateDriverStatus +
         "\n For Order Id: " + orderId);
+
 });
 
 exports.app = functions.https.onRequest(app);

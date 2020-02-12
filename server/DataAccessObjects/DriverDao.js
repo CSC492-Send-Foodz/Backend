@@ -5,16 +5,13 @@ class DriverDao {
     }
 
     notifyAllValidDrivers(activeOrder) {
-        let driverDatabase = this.gsDB.collection("DriverCollection");
+        let driverDatabase = this.gsDB.collection("Drivers");
         driverDatabase.where('capacity', '>=', activeOrder.getTotalQuantity()).get().then(snapshot => {
-            var driverIds = [];
             snapshot.forEach(doc => {
-                driverIds.push(doc.data()["driverId"]);
+                activeOrder.notifyDriver(doc.data()["driverId"])
             });
-            activeOrder.notifyDrivers(driverIds);
-        });
+        })
     }
-
 }
 module.exports = {
     DriverDao

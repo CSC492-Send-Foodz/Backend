@@ -19,14 +19,16 @@ class Order {
         this.inventoryItems = {};
         this.timePlaced = Date(orderRef.time);
         this.totalQuantity = 0;
-        this.driverId = {};  
+        this.driverId;
         this.ediOrderNumber = orderRef.ediOrderNumber;
-
         this.parseItems(orderRef.inventoryItems);
+        if(orderRef.orderId !== null){
+            this.orderId = orderRef.orderId;  
+        }
         this.setStatus(orderRef.status)
     }
 
-    getTotalQuantity(){ return this.totalQuantity; }
+    getTotalQuantity() { return this.totalQuantity; }
 
     getOrderId() { return this.orderId; }
 
@@ -37,24 +39,25 @@ class Order {
             case "Looking For Diver":
                 this.status = OrderStates.LOOKING_FOR_DRIVER;
                 break;
-            case "Unable To Complete":
+            case "Order is unable to completed":
                 this.status = OrderStates.UNABLE_TO_COMPLETE;
                 break;
-            case "Valid":
+            case "Order is able to completed":
                 this.status = OrderStates.VALID;
                 break;
-            case "Pickup In Progress":
+            case "Driver on the way to pick up inventory from the grocery store":
                 this.status = OrderStates.PICKUP_IN_PROGRESS;
                 break;
-            case "Drop Off In Progress":
+            case "Driver has picked up inventory from the grocery store.":
                 this.status = OrderStates.DROP_OFF_IN_PROGRESS;
                 break;
-            case "Delivered":
+            case "Driver has dropped off the inventory at the food bank":
                 this.status = OrderStates.DELIVERED;
                 break;
             default:
                 this.status = OrderStates.INVALID;
         }
+        this.status = newStatus;
     }
 
     getStatus() { return this.status; }
@@ -77,9 +80,9 @@ class Order {
 
     parseItems(inventoryItemsRef) {
 
-        for (const [itemId, item] of Object.entries(inventoryItemsRef)){
+        for (const [itemId, item] of Object.entries(inventoryItemsRef)) {
             this.inventoryItems[itemId] = new Item.Item(item, this.ediOrderNumber)
-            this.totalQuantity += Number(item.quantity); 
+            this.totalQuantity += Number(item.quantity);
         }
     }
     notifyFoodBank(foodBankURL) {
@@ -88,18 +91,10 @@ class Order {
 
     notifyGroceryStore(groceryStoreURL) {
         console.log("Grocery Store Notified 200");
-
     }
 
-    // Push notifications based on an array of Driver IDs
-    notifyDrivers(potentialDrivers) {
-        if (potentialDrivers !== undefined && potentialDrivers.length !== 0) {
-            potentialDrivers.forEach(driverId => {
-                console.log("Driver with id " + driverId + " notified with for order" + this.orderId);
-            });
-        } else {
-            console.log("Notification failed" + error);
-        }
+    notifyDriver(potentialDriverId) {
+        console.log("Driver with id " + potentialDriverId + " notified with for order " + this.orderId)
     }
 }
 

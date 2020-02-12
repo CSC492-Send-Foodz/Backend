@@ -1,13 +1,16 @@
+const Item = require("./Item");
 class EdiOrder {
-    constructor(jsonBody) {
-        this.ediOrderNumber = jsonBody.ediOrderNumber;
-        this.groceryId = jsonBody.groceryId;
+    constructor(ediOrder) {
+        this.ediOrderNumber = ediOrder.ediOrderNumber;
+        this.groceryId = ediOrder.groceryId;
+        this.inventoryItems = {};
+        this.parseItems(ediOrder.inventoryItems)
+    }
 
-        //Convert list of JSON objects to map of JSON
-        this.inventory = {};
-        jsonBody.inventory.forEach(item => {
-            this.inventory[item.inventoryItemId] = item;
-        });
+    parseItems(inventoryItemsRef) {
+        for (const [itemId, item] of Object.entries(inventoryItemsRef)) {
+            this.inventoryItems[itemId] = new Item.Item(item, this.ediOrderNumber)
+        }
     }
 }
 

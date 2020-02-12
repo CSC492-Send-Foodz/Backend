@@ -1,4 +1,5 @@
-/* eslint-disable promise/always-return */
+const Order = require("../Models/Order");
+
 class GroceryStoreDao {
     constructor(gsDB) {
         this.gsDB = gsDB;
@@ -9,14 +10,13 @@ class GroceryStoreDao {
         let gsRef = this.gsDB.collection("GroceryStores").doc(order.groceryId).collection("InventoryCollection").doc("Items");
         return gsRef.get().then(groceryStoreInventory => {
             for (const [itemId, item] of Object.entries(orderInventory)) {
-                if (item.getQuantity() > Number(groceryStoreInventory.data()[item.getInventoryItemId()]["quantity"])) {
-                    order.setStatus("Invalid");
-                    console.log("Reached Invalid State")
+                if (item.getQuantity() > Number(groceryStoreInventory.data()[itemId]["quantity"])) {
+                    order.setStatus(Order.OrderStates.INVALID);
                     return false;
                 }
             }
-            console.log("Continued to valid state")
-            order.setStatus("Looking for driver");
+            order.setStatus(Order.OrderStates.LOOKING_FOR_DRIVER);
+            console.log(order.getStatus())
             this.updateStoreInventoryQuantity(gsRef, orderInventory, groceryStoreInventory.data());
             return true;
 
@@ -32,32 +32,18 @@ class GroceryStoreDao {
                 "inventoryItemId": orderInventory[itemId].getInventoryItemId(), "name": orderInventory[itemId].getName(), "quantity": remainingQuantity
             };
         }
-        console.log("Decrement Values: ", updateItems);
-
         gsRef.update(updateItems);
     }
 
-    // for updating inventory in firestore
     newInventoryToGroceryStoreData(newEdiOrder) {
-        //write to the database new inventory
-        if (newEdiOrder.inventory === undefined || newEdiOrder.inventory.length === 0) {
-            console.log("Empty Order");
+        if (newEdiOrder.inventoryItems === undefined || newEdiOrder.inventoryItems.length === 0) {
             return null;
         }
-
-        var stringInventoryData = JSON.stringify(newEdiOrder.inventory);
+        var stringInventoryData = JSON.stringify(newEdiOrder.inventoryItems);
         var json_inventory = JSON.parse(stringInventoryData);
-        var batch = this.gsDB.batch();
-        var myKeyRef = this.gsDB.collection("GroceryStores").doc(`${newEdiOrder.groceryId}`).collection("InventoryCollection").doc("Items");
-        batch.set(myKeyRef, json_inventory);
-
-        batch.commit().then(function () {
-            console.log("Success!");
-            return null;
-        }).catch((err) => {
-            console.log("Error getting documents", err);
-            return err;
-        });
+        var myKeyRef = this.gsDB.collection("GroceryStores").doc(newEdiOrder.groceryId).collection("InventoryCollection").doc("Items");
+        myKeyRef.set(json_inventory,
+            { merge: true });
     }
 
     writeGroceryStoreData(companyName, location, storeNumber) {
@@ -68,6 +54,12 @@ class GroceryStoreDao {
             storeNumber: storeNumber
         },
             { merge: true });
+    }
+
+    updateGroceryStoreData(storeID, productID, newquantity) {
+        data = {}
+        data[storeID + "." + productID] = newquantity
+        this.gsDB.collection('GroceryStores').doc(`${storeID}`).collection('InventoryCollection').doc('Items').update(data);
     }
 
     generateUniqueKey() {
@@ -97,11 +89,6 @@ class GroceryStoreDao {
         } else {
             return key;
         }
-    }
-    updateGroceryStoreData(storeID, productID, newquantity) {
-        data = {}
-        data[storeID + "." + productID] = newquantity
-        this.gsDB.collection('GroceryStores').doc(`${storeID}`).collection('InventoryCollection').doc('Items').update(data);
     }
 }
 module.exports = {
