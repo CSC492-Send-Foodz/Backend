@@ -5,24 +5,14 @@ class FoodBankDao{
 
 
     writeFoodBankData(foodBankID, fbName, fblocation, fblocationNumber){
-        this.fbDB.ref('foodBank/' + foodBankID).set({
+        this.fbDB.collection("FoodBank").doc(`${foodBankID}`).set({
             fbName: fbName,
             fblocation: fblocation,
             fblocationNumber: fblocationNumber
-            });
+            },
+            {merge:true});
     }
-//Updating new Food Bank info in Firestore database
-
-    updateFoodBankData(foodBankID, fbName, fblocation, fblocationNumber) {
-        var update = {};
-        var updatedInfo = {
-            fbName: fbName,
-            fblocation: fblocation,
-            fblocationNumber: fblocationNumber
-        }
-        update['foodBank/' + foodBankID] = updatedInfo;
-        this.fbDB.ref().update(update);
-    }
+  
     updateCompletedOrders(order) {
         var stringInventoryData = JSON.stringify(order.getInventory());
         var json_inventory = JSON.parse(stringInventoryData);
@@ -38,4 +28,4 @@ class FoodBankDao{
     }
 }
    
-module.exports(FoodBankDao); 
+module.exports = FoodBankDao;
