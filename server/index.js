@@ -6,6 +6,8 @@ const OrderProcessor = require('./OrderProcessor');
 const GroceryStoreService = require('./GroceryStoreService');
 const EdiOrder = require('./EdiOrder');
 const GroceryStoreDao = require('./GroceryStoreDao');
+const FoodBankDao = require('./FoodBankDao');
+const FoodBank = require('./FoodBank');
 
 // Initialize App
 admin.initializeApp(functions.config().firebase);
@@ -15,6 +17,7 @@ var driverQuery = gsDB.collection('driver');
 var processor = new OrderProcessor(driverQuery);
 var groceryStoreService = new GroceryStoreService(groceryStores);
 var groceryStoreDao = new GroceryStoreDao(gsDB);
+var foodBankDao = new FoodBankDao(gsDB);
 
 /*******************Food Bank EndPoint *************************/
 const app = express();
@@ -28,6 +31,13 @@ app.post('/foodBank/placeOrder', (request, response) => {
     //write to firestore database
 });
 
+app.post('/foodBank/updateUserAccount', (request, response) => {
+    var body = request.body;
+    var foodBankModel = new FoodBank(body);
+    foodBankDao.writeFoodBankData(1, foodBankModel.getFoodBankName(), foodBankModel.getFoodBankLocation(), foodBankModel.getFoodBankLocationId());
+    
+    //write to firestore database
+});
 /*****************Grocery Store EndPoint **********************/
 
 app.post('/groceryStore/sendUser', (request, response) => {
