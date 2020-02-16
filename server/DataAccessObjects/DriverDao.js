@@ -14,6 +14,7 @@ class DriverDao {
     }
 
     createNewAccount(driver){
+        //check if driver Id doesn't exist
         if (driver.getDriverId() == null){
             var newId = this.generateUniqueKey();
             driver.setDriverId(newId);
@@ -24,28 +25,18 @@ class DriverDao {
         if (driver.getDriverStatus() == null){
             driver.setDriverStatus("Driver available to deliever an order");
         }
-        
-        console.log("this is id:", driver.driverId);
-        console.log("this is name:", driver.name);
-        console.log("this is capacity:", driver.capacity);
-        console.log("this is points:", driver.points);
-        console.log("this is status:", driver.status);
-        console.log("this is defaultRegion:", driver.defaultRegion);
-        console.log("this is completedOrders:", driver.completedOrderIds);
-
-
+    
         this.gsDB.collection("Drivers").doc(`${driver.driverId}`).set({
             name: driver.name,
             capacity: driver.capacity,
             points: driver.points,
             status: driver.status,
             defaultRegion: driver.defaultRegion,
-            completedOrderIds: driver.completedOrderIds,
-            
+            completedOrderIds: driver.completedOrderIds, 
         },
         { merge: true });
     }
-
+    
     updateDriverStatus(driverId, newStatus){
         return this.gsDB.collection("Drivers").doc(`${driverId}`).update({
             "status": newStatus

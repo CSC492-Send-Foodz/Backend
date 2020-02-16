@@ -74,9 +74,11 @@ app.post("/driver/driverStatusUpdate", (request, response) => {
 
 app.post("/driver/updateUserAccount", (request, response) => {
     var driver = new Driver.Driver(request.body);
-    driverDao.createNewAccount(driver);
 
-    response.status(200).send("Driver Id: " + driver.driverId +
+      //initalize driver object
+    driverDao.createNewAccount(driver);
+    
+     response.status(200).send("Driver Id: " + driver.driverId +
         " created");
 
 });

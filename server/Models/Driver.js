@@ -27,12 +27,11 @@ class Driver {
 
     getCompletedOrderIds(){ return this.completedOrderIds; }
 
-    setCompletedOrderIds(list){
-        if (typeof list == undefined) {
-            this.completedOrderIds = new Array();
-            console.log("this is inializaed list:", list);
+    setCompletedOrderIds(lst){
+        if (lst != undefined) {
+            this.completedOrderIds = lst;   
         }
-        this.completedOrderIds = list;
+        this.completedOrderIds = [];
     }
 
     setDriverStatus(newStatus) {
