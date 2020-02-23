@@ -2,29 +2,18 @@ class DriverDao {
 
     constructor(gsDB) {
         this.gsDB = gsDB;
-        //this.driverDatabase = this.gsDB.collection("Drivers");
+
     }
 
     notifyAllValidDrivers(activeOrder) {
-        this.driverDatabase.where('capacity', '>=', activeOrder.getTotalQuantity()).get().then(snapshot => {
+        this.gsDB.collection("Drivers").where('capacity', '>=', activeOrder.getTotalQuantity()).get().then(snapshot => {
             snapshot.forEach(doc => {
                 activeOrder.notifyDriver(doc.data()["driverId"])
             });
         })
     }
 
-    createNewAccount(driver){
-        //check if driver Id doesn't exist
-        if (driver.getDriverId() == null){
-            var newId = this.generateUniqueKey();
-            driver.setDriverId(newId);
-        }
-
-        //this is required as new driver doesn't have any status yet and
-        //firebase doesn't allow data to be 'undefined'
-        if (driver.getDriverStatus() == null){
-            driver.setDriverStatus("Driver available to deliever an order");
-        }
+    updateDriverAccount(driver){
     
         this.gsDB.collection("Drivers").doc(`${driver.driverId}`).set({
             name: driver.name,
