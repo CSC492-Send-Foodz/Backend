@@ -6,6 +6,7 @@ requirements = {
 
 function assertObjectValid(object) {
     if ((typeof object) in requirements) {
+        for (attribute in requirements[typeof object]) {
             if (!object.hasOwnProperty(attribute)) {
                 return false;
             }
