@@ -1,3 +1,4 @@
+const AssertRequestValid = require("../Services/AssertObjectValid");
 
 const DriverStates = {
     AVAILABLE: "Driver available to deliever an order",
@@ -12,6 +13,7 @@ class Driver {
         this.capacity = driverRef.capacity;
         this.defaultLocation = driverRef.defaultLocation;
         this.setDriverStatus(driverRef.status);
+        AssertRequestValid.assertObjectValid(this);
     }
 
     getDriverId() { return this.driverId; }

@@ -1,4 +1,5 @@
 const Item = require("./Item");
+const AssertRequestValid = require("../Services/AssertObjectValid");
 
 const OrderStates = {
     LOOKING_FOR_DRIVER: "Looking For Diver",
@@ -22,10 +23,11 @@ class Order {
         this.driverId;
         this.ediOrderNumber = orderRef.ediOrderNumber;
         this.parseItems(orderRef.inventoryItems);
-        if(orderRef.orderId !== null){
-            this.orderId = orderRef.orderId;  
+        if (orderRef.orderId !== null) {
+            this.orderId = orderRef.orderId;
         }
         this.setStatus(orderRef.status)
+        AssertRequestValid.assertObjectValid(this);
     }
 
     getTotalQuantity() { return this.totalQuantity; }
