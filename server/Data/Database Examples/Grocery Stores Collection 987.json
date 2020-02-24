@@ -1,8 +1,52 @@
 {
-    "987": {
-        "comanyName": "Metro",
-        "location": null,
-        "storeNumber": 987,
-        "inventory": {}
+    "companyName": "metro", 
+    "location": "mississauga", 
+    "storeNumber": 333,
+    "ediOrderNumber": "123ABC",
+    "inventory": {
+        "1234": {
+            "name": "apple",
+            "brandName": "FruitCo",
+            "storeID": 3948,
+            "quantity": 15,
+            "expirationDate": "02-03-21",
+            "ediOrderNumber": "124AZ",
+            "entryCreatedDate": "02-01-21",
+            "lastModified": "02-01-21",
+            "edibleByDate": "02-03-21"
+        },
+        "1235": {
+            "name": "orange",
+            "brandName": "FruitCo",
+            "storeID": 3948,
+            "quantity": 15,
+            "expirationDate": "02-03-21",
+            "ediOrderNumber": "124AZ",
+            "entryCreatedDate": "02-01-21",
+            "lastModified": "02-01-21",
+            "edibleByDate": "02-04-21"
+        },
+        "1236": {
+            "name": "banana",
+            "brandName": "FruitCo",
+            "storeID": 3948,
+            "quantity": 15,
+            "expirationDate": "02-03-21",
+            "ediOrderNumber": "124AZ",
+            "entryCreatedDate": "02-01-21",
+            "lastModified": "02-01-21",
+            "edibleByDate": "02-07-21"
+        },
+        "1237": {
+            "name": "peach",
+            "brandName": "FruitCo",
+            "storeID": 3948,
+            "quantity": 15,
+            "expirationDate": "02-03-21",
+            "ediOrderNumber": "124AZ",
+            "entryCreatedDate": "02-01-21",
+            "lastModified": "02-01-21",
+            "edibleByDate": "02-07-21"
+        }
     }
 }

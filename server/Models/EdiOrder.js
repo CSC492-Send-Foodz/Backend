@@ -12,6 +12,11 @@ class EdiOrder {
             this.inventoryItems[itemId] = new Item.Item(item, this.ediOrderNumber)
         }
     }
+
+    //set GroceryID
+    setGroceryId(groceryId){
+        this.groceryId = groceryId;
+    }
 }
 
 module.exports = {
