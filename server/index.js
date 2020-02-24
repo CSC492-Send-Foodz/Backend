@@ -55,6 +55,7 @@ app.post("/groceryStore/sendUser", (request, response) => {
         groceryUser.inventory,
         storeId)
 
+
     response.status(200).send("Grocery Store " + storeId + " Registered");
 });
 

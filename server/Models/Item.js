@@ -13,6 +13,8 @@ class Item {
         this.edibleByDate = new Date(date);
     }
 
+
+    
     getEdibleByDate() {
         return this.edibleByDate;
     }

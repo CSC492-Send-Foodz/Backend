@@ -49,6 +49,7 @@ class GroceryStoreDao {
             { merge: true });
     }
 
+
     writeGroceryStoreData(companyName, location, storeNumber, ediOrderNumber, inventory, storeId) {
         this.gsDB.collection("GroceryStores").doc(`${storeId}`).set({
             companyName: companyName,
