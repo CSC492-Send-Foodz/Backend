@@ -44,20 +44,24 @@ app.post("/foodBank/placeOrder", (request, response) => {
 app.post("/groceryStore/sendUser", (request, response) => {
     var groceryUser = request.body;
     //TODO parse userInfo and register grocery store
+    var storeId = groceryStoreDao.generateUniqueKey();
+
     console.log(groceryUser.companyName)
     groceryStoreDao.writeGroceryStoreData(
         groceryUser.companyName,
         groceryUser.location,
-        groceryUser.storeNumber)
+        groceryUser.storeNumber,
+        groceryUser.ediOrderNumber,
+        groceryUser.inventory,
+        storeId)
 
-    response.status(200).send("Grocery Store Registered");
+    response.status(200).send("Grocery Store " + storeId + " Registered");
 });
 
 //Update inventory of a store
 app.post("/groceryStore/inventoryUpdate", (request, response) => {
     //receive data body that is an inventory from single grocery store
-    var jsonBody = request.body;
-    var newEdiOrder = new EdiOrder.EdiOrder(jsonBody);
+    var newEdiOrder = new EdiOrder.EdiOrder(request.body);
     groceryStoreDao.newInventoryToGroceryStoreData(newEdiOrder);
     response.status(200).send("Inventory updated in Firestore");
 });
