@@ -1,24 +1,43 @@
+const AssertRequestValid = require("../Services/AssertObjectValid");
 
 const DriverStates = {
     AVAILABLE: "Driver available to deliever an order",
     ACCEPTED: "Driver has accepted order",
     REJECTED: "Driver has rejected order",
-    CANCELLED: "Driver has cancelled order"
+    CANCELLED: "Driver has cancelled order",
+    UNAVAILABLE: "Driver unavailable to deliever an order"
 };
 
 class Driver {
     constructor(driverRef) {
-        this.driverId = driverRef.driverId;
+        if (driverRef.driverId !== null ){
+            this.driverId = driverRef.driverId;
+        }
         this.capacity = driverRef.capacity;
-        this.defaultLocation = driverRef.defaultLocation;
+        this.defaultRegion = driverRef.defaultRegion;
+        this.name = driverRef.name;
+        this.points = driverRef.points;
+        this.setCompletedOrderIds(driverRef.completedOrderIds);
         this.setDriverStatus(driverRef.status);
+        AssertRequestValid.assertObjectValid(this);
     }
+
+    setDriverId(driverId){ this.driverId = driverId }
 
     getDriverId() { return this.driverId; }
     getCapacity() { return this.capacity; }
 
-    setDefaultLocation(defaultLocation) { this.defaultLocation = defaultLocation; }
-    getDefaultLocation() { return this.defaultLocation; }
+    setDefaultLocation(defaultRegion) { this.defaultRegion = defaultRegion; }
+    getDefaultLocation() { return this.defaultRegion; }
+
+    getCompletedOrderIds(){ return this.completedOrderIds; }
+
+    setCompletedOrderIds(lst){
+        if (lst != undefined) {
+            this.completedOrderIds = lst;   
+        }
+        this.completedOrderIds = [];
+    }
 
     setDriverStatus(newStatus) {
         switch (newStatus) {
@@ -34,8 +53,11 @@ class Driver {
             case "Driver has cancelled order":
                 this.status = DriverStates.CANCELLED;
                 break;
+            default:
+                this.status = DriverStates.UNAVAILABLE;
         }
     }
+    
     getDriverStatus() { return this.status; }
 }
 module.exports = {

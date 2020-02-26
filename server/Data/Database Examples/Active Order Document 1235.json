@@ -1,21 +1,21 @@
 {
-   "1235" : {
-    "orderRecieved": "2020-01-04",
-    "orderCompleted": "2020-01-05",
-    "storeID": 3948,
-    "status": "Pickup",
-    "foodBankId": 1,
-    "driverId": 1,
-    "inventory": [
-       {
-        "productId": 1234,
-        "productName": "apple",
-        "brandName": "FruitCo",
-        "storeID": 3948,
-        "quantity": 15,
-        "expirationDate": "02-03-21",
-        "EDIOrderNumber": "124AZ"
-        }
-    ]
+   "1235": {
+      "orderRecieved": "2020-01-04",
+      "orderCompleted": "2020-01-05",
+      "storeID": 3948,
+      "status": "Pickup",
+      "foodBankId": 1,
+      "driverId": 1,
+      "inventory": [
+         {
+            "productId": 1234,
+            "productName": "apple",
+            "brandName": "FruitCo",
+            "storeID": 3948,
+            "quantity": 15,
+            "expirationDate": "02-03-21",
+            "EDIOrderNumber": "124AZ"
+         }
+      ]
    }
 }

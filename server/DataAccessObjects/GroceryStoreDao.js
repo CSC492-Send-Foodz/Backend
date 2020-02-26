@@ -1,4 +1,5 @@
 const Order = require("../Models/Order");
+const EdiOrder = require("../Models/EdiOrder");
 
 class GroceryStoreDao {
     constructor(gsDB) {
@@ -41,25 +42,25 @@ class GroceryStoreDao {
         }
         var stringInventoryData = JSON.stringify(newEdiOrder.inventoryItems);
         var json_inventory = JSON.parse(stringInventoryData);
-        var myKeyRef = this.gsDB.collection("GroceryStores").doc(newEdiOrder.groceryId).collection("InventoryCollection").doc("Items");
+    
+        var myKeyRef = this.gsDB.collection("GroceryStores").doc(`${newEdiOrder.groceryId}`).collection("InventoryCollection").doc("Items");
         myKeyRef.set(json_inventory,
             { merge: true });
     }
 
-    writeGroceryStoreData(companyName, location, storeNumber) {
-        var storeId = this.generateUniqueKey();
+    writeGroceryStoreData(companyName, location, storeNumber, ediOrderNumber, inventory, storeId) {
         this.gsDB.collection("GroceryStores").doc(`${storeId}`).set({
             companyName: companyName,
             location: location,
             storeNumber: storeNumber
         },
-            { merge: true });
-    }
-
-    updateGroceryStoreData(storeID, productID, newquantity) {
-        data = {}
-        data[storeID + "." + productID] = newquantity
-        this.gsDB.collection('GroceryStores').doc(`${storeID}`).collection('InventoryCollection').doc('Items').update(data);
+            { merge: true }).then(() =>{
+                var ediOrder = new EdiOrder.EdiOrder(storeId, ediOrderNumber, inventory);
+                this.newInventoryToGroceryStoreData(ediOrder);
+            }).catch(function(error){
+                console.error("Error writing document:", error);
+            });
+        return storeId;
     }
 
     generateUniqueKey() {

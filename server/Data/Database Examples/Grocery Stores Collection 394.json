@@ -12,7 +12,8 @@
                 "expirationDate": "02-03-21",
                 "EDIOrderNumber": "124AZ",
                 "entryCreatedDate": "02-01-21",
-                "lastModified": "02-01-21"
+                "lastModified": "02-01-21",
+                "edibleByDate": "02-03-21"
             },
             "1235": {
                 "productName": "orange",
@@ -22,7 +23,8 @@
                 "expirationDate": "02-03-21",
                 "EDIOrderNumber": "124AZ",
                 "entryCreatedDate": "02-01-21",
-                "lastModified": "02-01-21"
+                "lastModified": "02-01-21",
+                "edibleByDate": "02-04-21"
             },
             "1236": {
                 "productName": "banana",
@@ -32,7 +34,8 @@
                 "expirationDate": "02-03-21",
                 "EDIOrderNumber": "124AZ",
                 "entryCreatedDate": "02-01-21",
-                "lastModified": "02-01-21"
+                "lastModified": "02-01-21",
+                "edibleByDate": "02-07-21"
             },
             "1237": {
                 "productName": "peach",
@@ -42,7 +45,8 @@
                 "expirationDate": "02-03-21",
                 "EDIOrderNumber": "124AZ",
                 "entryCreatedDate": "02-01-21",
-                "lastModified": "02-01-21"
+                "lastModified": "02-01-21",
+                "edibleByDate": "02-07-21"
             }
         }
     }
