@@ -6,14 +6,14 @@ class Item {
         this.ediOrderNumber = ediOrderNumber;
         this.name = itemRef.name;
         this.quantity = itemRef.quantity;
-        this.expiryDate = Date(itemRef.expiryDate);
+        this.expiryDate = new Date(itemRef.expiryDate);
         this.groceryStoreId = itemRef.groceryStoreId;
-        this.edibleByDate;
+        this.edibleByDate = new Date(itemRef.edibleByDate);
         AssertRequestValid.assertObjectValid(this);
     }
 
     setEdibleByDate(date) {
-        this.edibleByDate = Date(date);
+        this.edibleByDate = new Date(date);
     }
 
     getEdibleByDate() {

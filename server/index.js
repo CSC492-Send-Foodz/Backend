@@ -11,7 +11,7 @@ const EdiOrder = require("./Models/EdiOrder");
 const GroceryStoreDao = require("./DataAccessObjects/GroceryStoreDao");
 const ActiveOrderDao = require("./DataAccessObjects/ActiveOrderDao");
 const DriverDao = require("./DataAccessObjects/DriverDao");
-
+const Driver = require("./Models/Driver");
 // Initialize App
 admin.initializeApp(functions.config().firebase);
 var gsDB = admin.firestore();
@@ -19,9 +19,9 @@ var groceryStores = {};
 var activeOrdersDao = new ActiveOrderDao.ActiveOrderDao(gsDB);
 var groceryStoreDao = new GroceryStoreDao.GroceryStoreDao(gsDB);
 var driverDao = new DriverDao.DriverDao(gsDB);
-
 var processor = new OrderProcessor.OrderProcessor(gsDB, activeOrdersDao, groceryStoreDao, driverDao);
 var groceryStoreService = new GroceryStoreService.GroceryStoreService(groceryStores);
+
 
 /*******************Food Bank EndPoint *************************/
 const app = express();
@@ -39,21 +39,20 @@ app.post("/foodBank/placeOrder", (request, response) => {
 /*****************Grocery Store EndPoint **********************/
 app.post("/groceryStore/sendUser", (request, response) => {
     var groceryUser = request.body;
-    //TODO parse userInfo and register grocery store
-    console.log(groceryUser.companyName)
+    var storeId = groceryStoreDao.generateUniqueKey();
     groceryStoreDao.writeGroceryStoreData(
         groceryUser.companyName,
         groceryUser.location,
-        groceryUser.storeNumber)
-
-    response.status(200).send("Grocery Store Registered");
+        groceryUser.storeNumber,
+        groceryUser.ediOrderNumber,
+        groceryUser.inventory,
+        storeId)
+    response.status(200).send("Grocery Store " + storeId + " Registered");
 });
 
 //Update inventory of a store
 app.post("/groceryStore/inventoryUpdate", (request, response) => {
-    //receive data body that is an inventory from single grocery store
-    var jsonBody = request.body;
-    var newEdiOrder = new EdiOrder.EdiOrder(jsonBody);
+    var newEdiOrder = new EdiOrder.EdiOrder(request.body);
     groceryStoreDao.newInventoryToGroceryStoreData(newEdiOrder);
     response.status(200).send("Inventory updated in Firestore");
 });
@@ -61,13 +60,24 @@ app.post("/groceryStore/inventoryUpdate", (request, response) => {
 /*****************Driver EndPoint **********************/
 
 app.post("/driver/driverStatusUpdate", (request, response) => {
-    var orderId = request.body.orderId;
     var driverId = request.body.driverId;
     var updateDriverStatus = request.body.updateDriverStatus;
 
+    driverDao.updateDriverStatus(driverId, updateDriverStatus); 
     response.status(200).send("Driver Id: " + driverId +
-        "\n New Status: " + updateDriverStatus +
-        "\n For Order Id: " + orderId);
+        "\n New Status: " + updateDriverStatus);
+
+});
+
+app.post("/driver/updateUserAccount", (request, response) => {
+    var driver = new Driver.Driver(request.body);
+    let driverId = driverDao.generateUniqueKey();
+    driver.setDriverId(driverId);
+
+    //initalize driver object
+    driverDao.updateDriverAccount(driver);
+    response.status(200).send("Driver Id: " + driver.driverId +
+        " created");
 
 });
 
