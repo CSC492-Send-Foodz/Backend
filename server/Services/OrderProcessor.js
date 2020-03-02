@@ -1,93 +1,117 @@
-const Driver = require("../Models/Driver");
 const Order = require("../Models/Order");
+const Item = require("../Models/Item");
+const AssertRequestValid = require("./AssertObjectValid");
 
 class OrderProcessor {
-    constructor(gsDB, activeOrderDao, groceryStoreDao, driverDao) {
-        var driverQuery = gsDB.collection("Drivers");
-        this._orderQuery = gsDB.collection("ActiveOrders");
-        this.activeOrderDao = activeOrderDao;
+    constructor(DB, orderDao, groceryStoreDao, driverDao, foodBankDao, uniqueIdService) {
+        this._orderQuery = DB.collection("Orders");
+        this.orderDao = orderDao;
         this.groceryStoreDao = groceryStoreDao;
         this.driverDao = driverDao;
-        this.initDriverListener(driverQuery);
-        this.initOrderListener(this._orderQuery);
+        this.foodBankDao = foodBankDao;
+        this.uniqueIdService = uniqueIdService;
+
+        this.initOrderListener();
     }
 
-    processOrder(order) {
-        this.groceryStoreDao.isOrderValid(order).then(res => {
+
+    async createOrder(orderRef) {
+        var inventory = this._processOrderInventory(orderRef.inventory);
+        var order = new Order.Order(this.uniqueIdService.generateUniqueKey("Orders"), this._setOrderStatus(orderRef.status), orderRef.groceryStoreId, orderRef.foodBankId,
+            null, Date(orderRef.time), inventory, this._processOrderQuantity(inventory));
+        if (orderRef.groceryStoreId !== undefined) await AssertRequestValid.assertValidGroceryStore(this.groceryStoreDao, orderRef.groceryStoreId)
+        if (orderRef.foodBankId !== undefined) await AssertRequestValid.assertValidFoodBank(this.foodBankDao, orderRef.foodBankId)
+        
+        AssertRequestValid.assertObjectValid(order);
+        return order
+    }
+
+    _processOrderInventory(inventoryRef) {
+        var inventory = {};
+        inventoryRef.forEach(itemRef => inventory[itemRef.id] = new Item.Item(itemRef.id, itemRef.name, itemRef.brand, itemRef.groceryStoreId,
+            itemRef.quantity, Date(itemRef.expirationDate), itemRef.ediOrderNumber))
+        return inventory;
+    }
+
+    _processOrderQuantity(inventory) {
+        var totalQuantity = 0;
+        for (const [itemId, item] of Object.entries(inventory)) {
+            totalQuantity += Number(item.getQuantity());
+        }
+        return totalQuantity;
+    }
+
+    _setOrderStatus(newStatus) {
+        switch (newStatus) {
+            case "Looking For Driver":
+                return Order.OrderStates.LOOKING_FOR_DRIVER;
+
+            case "Unable to completed":
+                return Order.OrderStates.UNABLE_TO_COMPLETE;
+
+            case "Able to completed":
+                return Order.OrderStates.VALID;
+
+            case "Driver on the way to pick up inventory from the grocery store":
+                return Order.OrderStates.PICKUP_IN_PROGRESS;
+
+            case "Driver has picked up inventory from the grocery store.":
+                return Order.OrderStates.DROP_OFF_IN_PROGRESS;
+
+            case "Driver has dropped off the inventory at the food bank":
+                return Order.OrderStates.DELIVERED;
+
+            default:
+                return Order.OrderStates.INVALID;
+        }
+    }
+    initOrderListener() {
+        this._orderQuery.get().then(activeOrders => { 
+            activeOrders.docs.forEach(activeOrder => {
+                this._initOrderListener(activeOrder.id);
+            });
+        })
+    }
+
+    _initOrderListener(id) {
+        this._orderQuery.doc(`${id}`).onSnapshot(orderSnapshot => {
+            if (orderSnapshot.data() !== undefined && orderSnapshot.data().inventory !== undefined) {
+                var orderRef = orderSnapshot.data();
+                var order = new Order.Order(orderRef.id, orderRef.status, orderRef.groceryStoreId, orderRef.foodBankId,
+                    orderRef.driverId, orderRef.recieved, orderRef.inventory, orderRef.quantity);
+                var status = order.getStatus();
+
+                switch (status) {
+                    case "Looking For Driver":
+                        this.driverDao.notifyAllValidDrivers(order);
+                        return
+        
+                    case "In Progress":
+                        console.log('Advanced Shipping Notice - drivers');
+                        console.log('Advanced Shipping Notice - grocery');
+                        return 
+        
+                    case "Picked Up":
+                        console.log('Order ' + order.getId() + ' received');
+                        return 
+                }
+            }
+        });
+    }
+
+    async processOrder(order) {
+        await this.groceryStoreDao.isOrderValid(order).then(res => {
             if (res) {
-                var writePromise = this.activeOrderDao.addToActiveOrders(order);
-                this._attachNewListener(writePromise);
-                return true;
+                this.orderDao.addToOrders(order).then(
+                    res => {
+                        if (res.writeTime !== undefined) this._initOrderListener(order.getId());
+                    });
+                order.setStatus(Order.OrderStates.LOOKING_FOR_DRIVER)
             }
-            return false;
-        }).catch(err => { console.log("Error processing order validity", err); });
-    }
-
-    _attachNewListener(writePromise) {
-        writePromise.then(res => {
-            if (res.writeTime !== undefined) {
-                this._initOrderListener(this._orderQuery.doc(order.orderId.toString()));
-                return true;
+            else{
+                order.setStatus(Order.OrderStates.UNABLE_TO_COMPLETE)
             }
-            return false;
-        }).catch(err => {
-            console.log(err);
-        });
-    }
-
-    initDriverListener(driverQuery) {
-        driverQuery.onSnapshot(querySnapshot => {
-            querySnapshot.docChanges().forEach(change => {
-                // Get the driver data
-                var driver = change.doc.data();
-                driver.driverId = change.doc.ref.id;
-                var driverObj = new Driver.Driver(driver);
-                if (driverObj.getDriverStatus() === Driver.DriverStates.AVAILABLE) {
-                    this.activeOrderDao.findMatchingActiveOrders(driverObj);
-                }
-            });
-        });
-    }
-
-    initOrderListener(orderQuery) {
-        orderQuery.get().then(activeOrders => { // Get all the activeOrder documents
-            return activeOrders.docs.forEach(activeOrder => {
-                // Initialize the order listener
-                this._initOrderListener(orderQuery.doc(activeOrder.ref.id));
-            });
-        }).catch(error => {
-            console.log(error);
-        });
-    }
-
-    _initOrderListener(activeOrderQuery) {
-        activeOrderQuery.onSnapshot(orderSnapshot => {
-            if (orderSnapshot.data() !== undefined && orderSnapshot.data().inventoryItems !== undefined) {
-                // Generate the Order object and assign its orderId
-                var order = new Order.Order(orderSnapshot.data());
-                order.setOrderId(orderSnapshot.data().orderId);
-                // Get the status
-                var status = orderSnapshot.data().status;
-                if (status === 'Looking For Driver') {
-                    // Notify all drivers who can take the order
-                    this.driverDao.notifyAllValidDrivers(order);
-                } else if (status === 'In Progress') {
-                    // Send out Advanced Shipping Notice
-                    console.log('Advanced Shipping Notice - drivers');
-                    console.log('Advanced Shipping Notice - grocery');
-                } else if (status === 'Picked Up') {
-                    // Change status of orderRecieved
-                    console.log('order received');
-                    console.log(element.doc.data().orderRecieved);
-                }
-            }
-        });
-    }
-
-    notifyDriver(driver, orders) {
-        orders.forEach(order => {
-            order.notifyDriver(driver.getDriverId())
-        });
+        })
     }
 }
 

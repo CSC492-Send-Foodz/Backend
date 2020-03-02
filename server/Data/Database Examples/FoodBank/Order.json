@@ -1,0 +1,16 @@
+{
+    "status": "Looking For Driver",
+    "groceryStoreId": "6773",
+    "foodBankId": "8054",
+    "inventory": [
+        {
+            "id": 1234,
+            "name": "apple",
+            "brand": "FruitCo",
+            "groceryStoreId": 6773,
+            "quantity": 15,
+            "expirationDate": "02-03-21",
+            "ediOrderNumber": "124AZ"
+        }
+    ]
+}

@@ -1,64 +1,38 @@
-const AssertRequestValid = require("../Services/AssertObjectValid");
-
 const DriverStates = {
-    AVAILABLE: "Driver available to deliever an order",
-    ACCEPTED: "Driver has accepted order",
-    REJECTED: "Driver has rejected order",
-    CANCELLED: "Driver has cancelled order",
-    UNAVAILABLE: "Driver unavailable to deliever an order"
+    AVAILABLE: "Available",
+    UNAVAILABLE: "Unavailable"
 };
 
 class Driver {
-    constructor(driverRef) {
-        if (driverRef.driverId !== null ){
-            this.driverId = driverRef.driverId;
-        }
-        this.capacity = driverRef.capacity;
-        this.defaultRegion = driverRef.defaultRegion;
-        this.name = driverRef.name;
-        this.points = driverRef.points;
-        this.setCompletedOrderIds(driverRef.completedOrderIds);
-        this.setDriverStatus(driverRef.status);
-        AssertRequestValid.assertObjectValid(this);
+    constructor(id, capcity, name, status, currentLocation) {
+        this.id = id;
+        this.capacity = capcity;
+        this.name = name;
+        this.currentLocation = currentLocation;
+        this.setStatus(status);
     }
 
-    setDriverId(driverId){ this.driverId = driverId }
+    setId(id) { this.id = id }
+    getId() { return this.id; }
 
-    getDriverId() { return this.driverId; }
+    setCapacity(capacity) { this.capacity = capacity }
     getCapacity() { return this.capacity; }
 
-    setDefaultLocation(defaultRegion) { this.defaultRegion = defaultRegion; }
-    getDefaultLocation() { return this.defaultRegion; }
+    setName(name) { this.name = name }
+    getName() { return this.name; }
 
-    getCompletedOrderIds(){ return this.completedOrderIds; }
-
-    setCompletedOrderIds(lst){
-        if (lst != undefined) {
-            this.completedOrderIds = lst;   
+    setStatus(newStatus) {
+        if(newStatus === "Available"){
+            this.status = DriverStates.AVAILABLE;
         }
-        this.completedOrderIds = [];
-    }
-
-    setDriverStatus(newStatus) {
-        switch (newStatus) {
-            case "Driver available to deliever an order":
-                this.status = DriverStates.AVAILABLE;
-                break;
-            case "Driver has accepted order":
-                this.status = DriverStates.ACCEPTED;
-                break;
-            case "Driver has rejected order":
-                this.status = DriverStates.REJECTED;
-                break;
-            case "Driver has cancelled order":
-                this.status = DriverStates.CANCELLED;
-                break;
-            default:
-                this.status = DriverStates.UNAVAILABLE;
+        else{
+            this.status = DriverStates.UNAVAILABLE;
         }
     }
-    
-    getDriverStatus() { return this.status; }
+    getStatus() { return this.status; }
+
+    setCurrentLocation(currentLocation) { this.currentLocation = currentLocation; }
+    getCurrentLocation() { return this.currentLocation; }
 }
 module.exports = {
     Driver,

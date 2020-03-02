@@ -1,6 +1,3 @@
-const Item = require("./Item");
-const AssertRequestValid = require("../Services/AssertObjectValid");
-
 const OrderStates = {
     LOOKING_FOR_DRIVER: "Looking For Driver",
     UNABLE_TO_COMPLETE: "Order is unable to completed",
@@ -13,79 +10,31 @@ const OrderStates = {
 
 class Order {
 
-    constructor(orderRef) {
-        this.orderId;
-        this.foodBankId = orderRef.foodBankId;
-        this.groceryId = orderRef.groceryId;
-        this.inventoryItems = {};
-        this.timePlaced = Date(orderRef.time);
-        this.totalQuantity = 0;
-        this.driverId;
-        this.ediOrderNumber = orderRef.ediOrderNumber;
-        this.parseItems(orderRef.inventoryItems);
-        if (orderRef.orderId !== undefined) {
-            this.orderId = orderRef.orderId;
-        }
-        this.setStatus(orderRef.status);
-        AssertRequestValid.assertObjectValid(this);
+    constructor(id, status, groceryStoreId, foodBankId, driverId, recieved, inventory, quantity) {
+        this.id = id;
+        this.status = status;
+        this.groceryStoreId = groceryStoreId;
+        this.foodBankId = foodBankId;
+        this.driverId = driverId;
+        this.recieved = recieved;
+        this.completed;
+        this.inventory = inventory;
+        this.quantity = quantity
     }
 
-    getTotalQuantity() { return this.totalQuantity; }
-
-    getOrderId() { return this.orderId; }
-
-    setOrderId(orderId) { this.orderId = orderId; }
-
-    setStatus(newStatus) {
-        switch (newStatus) {
-            case "Looking For Driver":
-                this.status = OrderStates.LOOKING_FOR_DRIVER;
-                break;
-            case "Order is unable to completed":
-                this.status = OrderStates.UNABLE_TO_COMPLETE;
-                break;
-            case "Order is able to completed":
-                this.status = OrderStates.VALID;
-                break;
-            case "Driver on the way to pick up inventory from the grocery store":
-                this.status = OrderStates.PICKUP_IN_PROGRESS;
-                break;
-            case "Driver has picked up inventory from the grocery store.":
-                this.status = OrderStates.DROP_OFF_IN_PROGRESS;
-                break;
-            case "Driver has dropped off the inventory at the food bank":
-                this.status = OrderStates.DELIVERED;
-                break;
-            default:
-                this.status = OrderStates.INVALID;
-        }
-        this.status = newStatus;
-    }
-
+    getId() { return this.id }
     getStatus() { return this.status; }
+    getGroceryStoreId() {return this.groceryStoreId;}
+    getFoodBankId() {return this.foodBankId;}
+    getDriverId() {return this.driverId;}
+    getRecieved() {return this.recieved;}
+    getCompleted() {return this.completed;}
+    getInventory() { return this.inventory; }
+    getQuantity() { return this.quantity; }
 
-    setFoodBankId(foodBankId) { this.foodBankId = foodBankId; }
+    setStatus(status) { this.status = status; }
+    
 
-    getFoodBankId() { return this.foodBankId; }
-
-    setGroceryId(groceryId) { this.groceryId = groceryId; }
-
-    getGroceryId() { return this.groceryId; }
-
-    setTime(time) { this.timePlaced = time; }
-
-    getTime() { return this.timePlaced; }
-
-    getItem(itemId) { return this.inventoryItems[itemId]; }
-
-    getInventory() { return this.inventoryItems; }
-
-    parseItems(inventoryItemsRef) {
-        for (const [itemId, item] of Object.entries(inventoryItemsRef)) {
-            this.inventoryItems[itemId] = new Item.Item(item, this.ediOrderNumber)
-            this.totalQuantity += Number(item.quantity);
-        }
-    }
     notifyFoodBank(foodBankURL) {
         console.log("Food Bank Notified 200");
     }
@@ -95,7 +44,7 @@ class Order {
     }
 
     notifyDriver(potentialDriverId) {
-        console.log("Driver with id " + potentialDriverId + " notified with for order " + this.orderId);
+        console.log("Driver with id " + potentialDriverId + " notified with for order " + this.id);
     }
 }
 
