@@ -3,7 +3,10 @@
 const admin = require("firebase-admin");
 const functions = require("firebase-functions");
 // Endpoint Imports
-const express = require("express");
+const express = require("express")
+const cors = require('cors');
+const app = express();
+app.use(cors());
 
 //Services Imports
 const UniqueIdService = require("./Services/UniqueIdService");
@@ -41,9 +44,22 @@ exports.pruneDaily = functions.pubsub.schedule('0 0 * * *').onRun((context) => {
     groceryStoreDao.pruneInventory();
     return null;
 });
-/*******************Food Bank EndPoint *************************/
-const app = express();
+/*******************Order EndPoint *************************/
+app.post("/order/statusUpdate", async(request, response) => {
+    // try {
+        await orderProcessor.updateActiveOrderStatus(request.body.id, request.body.status);
+    // }
+    // catch (e) {
+    //     response.status(202).send(e.message)
+    //     return
+    // }
+    response.status(200).send("Order " + request.body.id + " New Status: " + request.body.status);
 
+});
+
+
+
+/*******************Food Bank EndPoint *************************/
 app.post("/foodBank/placeOrder", async(request, response) => {
     try {
         var order = await orderProcessor.createOrder(request.body);

@@ -44,6 +44,13 @@ function assertValidGroceryStore(groceryStoreDao, id) {
     })
 }
 
+function assertValidActiveOrder(orderDao, id){
+    return orderDao.getOrders(id).then((doc) => {
+        if (!doc.exists) {
+            throw new InvalidAccountId(id)
+        }
+    })
+}
 
 class MissingAttributes extends Error {
     constructor(missingAttributes) {
@@ -65,6 +72,6 @@ module.exports = {
     assertObjectValid,
     assertValidGroceryStore,
     assertValidDriver,
-    assertValidFoodBank
-
+    assertValidFoodBank,
+    assertValidActiveOrder
 };

@@ -8,7 +8,7 @@ class OrderDao {
 
     updateActiveOrderStatus(orderId, newStatus) {
         //get order from db using orderId
-        let orderRef = this.ordersCollectionRef.doc(`${orderId()}`);
+        let orderRef = this.ordersCollectionRef.doc(`${orderId}`);
         //modify order status
         return orderRef.update({
             "status": newStatus
@@ -16,7 +16,7 @@ class OrderDao {
             console.log("Failed to update order " + orderId)
             // eslint-disable-next-line promise/always-return
         }).then(() => {
-            console.log("Active order" + orderId + " status updated")
+            console.log("Active order " + orderId + " status updated")
         });
 
     }
@@ -25,6 +25,11 @@ class OrderDao {
         return this.ordersCollectionRef.doc(`${order.getId()}`).set(
             JSON.parse(JSON.stringify(order))
         );
+    }
+
+    async getOrders(id){
+        let order = await this.ordersCollectionRef.doc(`${id}`).get();
+        return order;
     }
 
     // removeFromOrders(orderId) {

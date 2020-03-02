@@ -113,6 +113,12 @@ class OrderProcessor {
             }
         })
     }
+
+    async updateActiveOrderStatus(orderId, status){
+        if(orderId !== undefined) await AssertRequestValid.assertValidActiveOrder(this.orderDao, orderId)
+        this.orderDao.updateActiveOrderStatus(orderId, this._setOrderStatus(status));
+    }
+   
 }
 
 module.exports = {
