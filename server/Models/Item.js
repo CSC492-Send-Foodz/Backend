@@ -1,52 +1,21 @@
-const AssertRequestValid = require("../Services/AssertObjectValid");
-
 class Item {
-    constructor(itemRef, ediOrderNumber, edibleByDate) {
-        this.inventoryItemId = itemRef.inventoryItemId;
-        this.ediOrderNumber = ediOrderNumber;
-        this.name = itemRef.name;
-        this.quantity = itemRef.quantity;
-        this.expiryDate = new Date(itemRef.expiryDate);
-        this.groceryStoreId = itemRef.groceryStoreId;
-        this.edibleByDate = new Date(itemRef.edibleByDate);
-        AssertRequestValid.assertObjectValid(this);
-    }
-
-    setEdibleByDate(date) {
-        this.edibleByDate = new Date(date);
-    }
-
-    getEdibleByDate() {
-        return this.edibleByDate;
-    }
-
-    getInventoryItemId() {
-        return this.inventoryItemId;
-    }
-
-    getEdiOrderNumber() {
-        return this.ediOrderNumber;
-    }
-
-    getName() {
-        return this.name;
-    }
-
-    getQuantity() {
-        return this.quantity;
-    }
-
-    setQuantity(quantity) {
+    constructor(id, name, brand, groceryStoreId, quantity, expirationDate, ediOrderNumber) {
+        this.id = id;
+        this.name = name;
+        this.brand = brand;
+        this.groceryStoreId = groceryStoreId;
         this.quantity = quantity;
+        this.expirationDate = expirationDate;
+        this.ediOrderNumber = ediOrderNumber
     }
 
-    getExpiryDate() {
-        return this.expiryDate;
-    }
-
-    getGroceryStoreId() {
-        return this.groceryStoreId;
-    }
+    getId() { return this.id; }
+    getName() { return this.name; }
+    getBrand() { return this.brand; }
+    getGroceryStoreId() { return this.groceryStoreId; }
+    getQuantity() { return this.quantity; }
+    getExpirationDate() { return this.expirationDate; }
+    getEdiOrderNumber() { return this.ediOrderNumber; }
 }
 
 module.exports = {

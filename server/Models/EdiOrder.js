@@ -1,25 +1,12 @@
-const Item = require("./Item");
-const AssertRequestValid = require("../Services/AssertObjectValid");
-
 class EdiOrder {
-    constructor(ediOrder) {
-        this.ediOrderNumber = ediOrder.ediOrderNumber;
-        this.groceryId = ediOrder.groceryId;
-        this.inventoryItems = {};
-        this.parseItems(ediOrder.inventoryItems);
-        AssertRequestValid.assertObjectValid(this);
+    constructor(groceryStoreId, ediOrderNumber, inventory) {
+        this.groceryStoreId = groceryStoreId;
+        this.ediOrderNumber = ediOrderNumber;
+        this.inventory = inventory;
     }
-
-    parseItems(inventoryItemsRef) {
-        for (const [itemId, item] of Object.entries(inventoryItemsRef)) {
-            this.inventoryItems[itemId] = new Item.Item(item, this.ediOrderNumber);
-        }
-    }
-
-    //set GroceryID
-    setGroceryId(groceryId){
-        this.groceryId = groceryId;
-    }
+    getGroceryStoreId() {return this.groceryStoreId}
+    getEdiOrderNumber() {return this.ediOrderNumber}
+    getInventory() {return this.inventory}
 }
 
 module.exports = {

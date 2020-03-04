@@ -1,10 +1,9 @@
-const Order = require("../Models/Order");
-
 requirements = {
-    "Order": ["foodBankId", "groceryId", "ediOrderNumber", "inventoryItems"],
-    "Item": ["ediOrderNumber", "name", "quantity", "groceryStoreId"],
-    "Driver": ["capacity", "status"],
-    "EdiOrder": ["ediOrderNumber", "groceryId", "inventoryItems"]
+    "Order": ["status", "groceryStoreId", "foodBankId", "driverId", "recieved", "inventory"],
+    "Item": ["id", "name", "brand", "groceryStoreId", "quantity", "expirationDate", "ediOrderNumber"],
+    "Driver": ["id", "status", "name", "status", "currentLocation"],
+    "FoodBank": ["id", "name", "address", "locationId"],
+    "EdiOrder": ["groceryStoreId", "ediOrderNumber", "inventory"],
 };
 
 function assertObjectValid(object) {
@@ -13,26 +12,66 @@ function assertObjectValid(object) {
         for (const attribute of requirements[object.constructor.name]) {
             if (!object.hasOwnProperty(attribute) || object[attribute] === undefined) {
                 missing.push(attribute);
-                console.log(missing);
             }
         }
         if (missing.length !== 0) {
-            throw new AssertError(missing);
+            throw new MissingAttributes(missing);
         }
     }
 }
 
-class AssertError extends Error {
+function assertValidFoodBank(foodBankIdDao, id) {
+    return foodBankIdDao.getFoodBankAccountData(id).then((doc) => {
+        if (!doc.exists) {
+            throw new InvalidAccountId(id)
+        }
+    })
+}
+
+function assertValidDriver(driverDao, id) {
+    return driverDao.getDriverAccountData(id).then((doc) => {
+        if (!doc.exists) {
+            throw new InvalidAccountId(id)
+        }
+    })
+}
+
+function assertValidGroceryStore(groceryStoreDao, id) {
+    return groceryStoreDao.getGroceryStoreData(id).then((doc) => {
+        if (!doc.exists) {
+            throw new InvalidAccountId(id)
+        }
+    })
+}
+
+function assertValidActiveOrder(orderDao, id){
+    return orderDao.getOrders(id).then((doc) => {
+        if (!doc.exists) {
+            throw new InvalidAccountId(id)
+        }
+    })
+}
+
+class MissingAttributes extends Error {
     constructor(missingAttributes) {
-        var message = "Missing Attributes:\n";
+        var message = "Missing Attributes: ";
         for (const attribute of missingAttributes) {
-            message += "\t" + attribute + "\n";
+            message += attribute + "\n";
         }
         super(message);
-        this.name = "Assertion Error"
+    }
+}
+
+class InvalidAccountId extends Error {
+    constructor(id) {
+        super(id + " is not a vaid ID");
     }
 }
 
 module.exports = {
-    assertObjectValid
+    assertObjectValid,
+    assertValidGroceryStore,
+    assertValidDriver,
+    assertValidFoodBank,
+    assertValidActiveOrder
 };

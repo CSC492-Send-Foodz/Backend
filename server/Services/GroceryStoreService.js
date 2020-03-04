@@ -1,63 +1,77 @@
-
-/*This our observable; GSInventory will notify all orders when the store inventory
- * gets updated*/
+const GroceryStore = require("../Models/GroceryStore");
+const EdiOrder = require("../Models/EdiOrder");
+const Item = require("../Models/Item");
+const AssertRequestValid = require("./AssertObjectValid");
 
 class GroceryStoreService {
-	constructor(emptyDict) {
-		this.globalInventory = emptyDict;
+	constructor(DB, groceryStoreDao, uniqueIdService) {
+		this.groceryStoreDao = groceryStoreDao;
+		this.uniqueIdService = uniqueIdService;
+        this.collectionQuery = "GroceryStores";
+        this._GroceryStoresCollectionQuery = DB.collection(this.collectionQuery);
+
+        this.initGroceryStoreListener()
 	}
 
-	//newly added
-	refreshInventory(updatedGlobalInventory) {
-		this.globalInventory = updatedGlobalInventory;
-	}
+	async createGroceryStore(groceryStoreRef) {
+        var groceryStore = new GroceryStore.GroceryStore(
+            groceryStoreRef.id === undefined ? this.uniqueIdService.generateUniqueKey(this.collectionQuery) : groceryStoreRef.id,
+            groceryStoreRef.storeNumber,
+			groceryStoreRef.address,
+			groceryStoreRef.company);
 
-	/*Update status of each order in the list based on whether the order
-	 * can be completed with store inventory in stock 
-	 * */
-	updateStatus(order) {
+        if (groceryStoreRef.id !== undefined) await AssertRequestValid.assertValidGroceryStore(this.groceryStoreDao, groceryStore.getId())
+        AssertRequestValid.assertObjectValid(groceryStore);
 
-		//check there is a matching groceryId of order
-		if (order.getGroceryId() in this.globalInventory) {
+        this._initGroceryStoreListener(groceryStore.getId())
+        
+        return groceryStore;
+    }
 
-			//this is the grocery inventory value we want
-			var matchingInventory = this.globalInventory[order.getGroceryId()];
+    updateGroceryStoreAccount(groceryStore) {
+        this.groceryStoreDao.updateGroceryStoreData(groceryStore);
+    }
 
-			//iterate through each item in the order
-			//an item is a hash table
-			for (var item in order.getInventory()) {
-				if (item["inventoryItemId"] in matchingInventory) {
+    async createEDIOrder(ediOrderRef) {
+        var ediOrder = new EdiOrder.EdiOrder(ediOrderRef.groceryStoreId, ediOrderRef.ediOrderNumber,
+             this._processEDIOrderInventory(ediOrderRef.inventory, ediOrderRef.ediOrderNumber));
+        if (ediOrderRef.groceryStoreId !== undefined) await AssertRequestValid.assertValidGroceryStore(this.groceryStoreDao, ediOrderRef.groceryStoreId)
+        AssertRequestValid.assertObjectValid(ediOrder);
+        return ediOrder
+    }
 
-					//increment counter if items in order is less than that of inventory
-					if (item["quantity"] > matchingInventory[item["inventoryItemId"]].getQuantity()) {
-						order.setStatus("Invalid");
-						return;
-					}
-				}
-			}
-			order.setStatus("Looking for Driver");
+    _processEDIOrderInventory(inventoryRef, ediOrderNumber) {
+        var inventory = {};
+        inventoryRef.forEach(itemRef => inventory[itemRef.id] = new Item.Item(itemRef.id, itemRef.name, itemRef.brand, itemRef.groceryStoreId,
+            itemRef.quantity, new Date(itemRef.expirationDate), ediOrderNumber))
+        return inventory;
+    }
 
-			//update actual quantity
-			this.updateInventory(order);
-		}
-	}
+    updateInventory(editOrder) {
+        this.groceryStoreDao.updateInventory(editOrder);
+    }
 
-	/*If the order can be fulfilled, update store inventory by decrementing 
-	 * store inventory items
-	 */
-	updateInventory(order) {
-		for (var orditem in order.getInventory()) {
-			const gs = this.globalInventory[order.getGroceryId()];
-			gs[orditem].setQuantity(gs[orditem].getQuantity() - order.getInventory()[orditem]["quantity"]);
-		}
-	}
-
-	// outputToConsole(order){
-	// 	console.log("Order Id " + order.getOrderId() + ", Status Update: " + order.getStatus());
-	// }
+    initGroceryStoreListener() {
+        this._GroceryStoresCollectionQuery.get().then(groceryStores => { 
+            groceryStores.docs.forEach(groceryStore => {
+                this._initGroceryStoreListener(groceryStore.id);
+            });
+        })
+    }
+    
+    _initGroceryStoreListener(id) {
+        this._GroceryStoresCollectionQuery.doc(`${id}`).collection("InventoryCollection").doc("Items")
+        .onSnapshot(groceryStoreSnapshot => {
+            // console.log(groceryStoreSnapshot)
+            // if (groceryStoreSnapshot.data() !== undefined && (groceryStoreSnapshot.type === "added" || groceryStoreSnapshot.type === "modified")) {
+            //     console.log("Grocery Store " + id + " with inventory: ", groceryStoreSnapshot.data())
+            // }
+        });
+    }
 }
 
 module.exports = {
 	GroceryStoreService
 };
+
 
