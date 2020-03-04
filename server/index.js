@@ -46,13 +46,13 @@ exports.pruneDaily = functions.pubsub.schedule('0 0 * * *').onRun((context) => {
 });
 /*******************Order EndPoint *************************/
 app.post("/order/statusUpdate", async(request, response) => {
-    // try {
+    try {
         await orderProcessor.updateActiveOrderStatus(request.body.id, request.body.status);
-    // }
-    // catch (e) {
-    //     response.status(202).send(e.message)
-    //     return
-    // }
+    }
+    catch (e) {
+        response.status(202).send(e.message)
+        return
+    }
     response.status(200).send("Order " + request.body.id + " New Status: " + request.body.status);
 
 });

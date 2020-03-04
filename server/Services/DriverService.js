@@ -49,7 +49,6 @@ class DriverService {
         this._DriverCollectionQuery.doc(`${id}`).onSnapshot(driverSnapshot => {
             if (driverSnapshot.data() !== undefined && 
             (driverSnapshot.type === "added" || driverSnapshot.type === "modified")) {
-                console.log(driverSnapshot.type)
                 var driverRef = driverSnapshot.data();
                 var driver = new Driver.Driver(
                     driverRef.id,
@@ -62,7 +61,7 @@ class DriverService {
 
                 switch (status) {
                     case "Available":
-                        // this.findMatchingActiveOrders(driver);
+                        this.findMatchingActiveOrders(driver);
                         return
                     case "Unavailable":
                         console.log('Driver ' + driver.getId() + ' unavailable');

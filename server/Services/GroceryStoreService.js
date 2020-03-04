@@ -60,14 +60,14 @@ class GroceryStoreService {
     }
     
     _initGroceryStoreListener(id) {
-        this._GroceryStoresCollectionQuery.doc(`${id}`).collection("InventoryCollection").doc("Items").onSnapshot(groceryStoreSnapshot => {
-            if (groceryStoreSnapshot.data() !== undefined) {
-
-                console.log(groceryStoreSnapshot.data())
-            }
+        this._GroceryStoresCollectionQuery.doc(`${id}`).collection("InventoryCollection").doc("Items")
+        .onSnapshot(groceryStoreSnapshot => {
+            // console.log(groceryStoreSnapshot)
+            // if (groceryStoreSnapshot.data() !== undefined && (groceryStoreSnapshot.type === "added" || groceryStoreSnapshot.type === "modified")) {
+            //     console.log("Grocery Store " + id + " with inventory: ", groceryStoreSnapshot.data())
+            // }
         });
     }
-
 }
 
 module.exports = {
