@@ -3,86 +3,136 @@
 const admin = require("firebase-admin");
 const functions = require("firebase-functions");
 // Endpoint Imports
-const express = require("express");
-// Other Imports
-const Order = require("./Models/Order");
+const express = require("express")
+const cors = require('cors');
+const app = express();
+app.use(cors());
+
+//Services Imports
+const UniqueIdService = require("./Services/UniqueIdService");
 const OrderProcessor = require("./Services/OrderProcessor");
+const FoodBankService = require("./Services/FoodBankService");
+const DriverService = require("./Services/DriverService");
 const GroceryStoreService = require("./Services/GroceryStoreService");
-const EdiOrder = require("./Models/EdiOrder");
-const GroceryStoreDao = require("./DataAccessObjects/GroceryStoreDao");
-const ActiveOrderDao = require("./DataAccessObjects/ActiveOrderDao");
+
+//Daos Imports
+const FoodBankDao = require('./DataAccessObjects/FoodBankDao');
 const DriverDao = require("./DataAccessObjects/DriverDao");
-const Driver = require("./Models/Driver");
+const GroceryStoreDao = require("./DataAccessObjects/GroceryStoreDao");
+const OrderDao = require("./DataAccessObjects/OrderDao");
+
 // Initialize App
 admin.initializeApp(functions.config().firebase);
-var gsDB = admin.firestore();
-var groceryStores = {};
-var activeOrdersDao = new ActiveOrderDao.ActiveOrderDao(gsDB);
-var groceryStoreDao = new GroceryStoreDao.GroceryStoreDao(gsDB);
-var driverDao = new DriverDao.DriverDao(gsDB);
-var processor = new OrderProcessor.OrderProcessor(gsDB, activeOrdersDao, groceryStoreDao, driverDao);
-var groceryStoreService = new GroceryStoreService.GroceryStoreService(groceryStores);
+var DB = admin.firestore();
+
+//Initialize Daos
+var orderDao = new OrderDao.OrderDao(DB);
+var groceryStoreDao = new GroceryStoreDao.GroceryStoreDao(DB);
+var driverDao = new DriverDao.DriverDao(DB);
+var foodBankDao = new FoodBankDao.FoodBankDao(DB);
+
+//Initialize Services
+var uniqueIdService = new UniqueIdService.UniqueIdService(DB);
+var foodBankService = new FoodBankService.FoodBankService(foodBankDao, uniqueIdService);
+var driverService = new DriverService.DriverService(DB, driverDao, uniqueIdService, orderDao);
+var groceryStoreService = new GroceryStoreService.GroceryStoreService(DB, groceryStoreDao, uniqueIdService);
+var orderProcessor = new OrderProcessor.OrderProcessor(DB, orderDao, groceryStoreDao, driverDao, foodBankDao, uniqueIdService);
+
+
 
 exports.pruneDaily = functions.pubsub.schedule('0 0 * * *').onRun((context) => {
     groceryStoreDao.pruneInventory();
     return null;
 });
-/*******************Food Bank EndPoint *************************/
-const app = express();
+/*******************Order EndPoint *************************/
+app.post("/order/statusUpdate", async(request, response) => {
+    try {
+        await orderProcessor.updateActiveOrderStatus(request.body.id, request.body.status);
+    }
+    catch (e) {
+        response.status(202).send(e.message)
+        return
+    }
+    response.status(200).send("Order " + request.body.id + " New Status: " + request.body.status);
 
-app.post("/foodBank/placeOrder", (request, response) => {
-    var body = request.body;
-    let orderId = activeOrdersDao.generateUniqueKey();
-    order = new Order.Order(body);
-    order.setOrderId(orderId);
-    console.log("Order received and instance created with unique id: " + order.getOrderId())
-    processor.processOrder(order, groceryStoreService);
-    response.status(200).send("Order Received");
+});
+
+
+
+/*******************Food Bank EndPoint *************************/
+app.post("/foodBank/placeOrder", async(request, response) => {
+    try {
+        var order = await orderProcessor.createOrder(request.body);
+        await orderProcessor.processOrder(order);
+    }
+    catch (e) {
+        response.status(202).send(e.message)
+        return
+    }
+    response.status(200).send("Order Id " + order.getId() + " status is " + order.getStatus());
+});
+
+app.post('/foodBank/updateUserAccount',  async (request, response) => {
+    try {
+        var foodBank = await foodBankService.createFoodBank(request.body);
+        foodBankService.updateFoodBankAccount(foodBank);
+    }
+    catch (e) {
+        response.status(202).send(e.message)
+        return
+    }
+    response.status(200).send("Food Bank " + foodBank.getId() + " Account Updated");
 });
 
 /*****************Grocery Store EndPoint **********************/
-app.post("/groceryStore/updateUserAccount", (request, response) => {
-    var groceryUser = request.body;
-    var storeId = groceryStoreDao.generateUniqueKey();
-    groceryStoreDao.writeGroceryStoreData(
-        groceryUser.companyName,
-        groceryUser.location,
-        groceryUser.storeNumber,
-        groceryUser.ediOrderNumber,
-        groceryUser.inventory,
-        storeId)
-    response.status(200).send("Grocery Store " + storeId + " Registered");
+app.post("/groceryStore/updateUserAccount", async (request, response) => {
+    try {
+        var groceryStore = await groceryStoreService.createGroceryStore(request.body);
+        groceryStoreService.updateGroceryStoreAccount(groceryStore);
+    }
+    catch (e) {
+        response.status(202).send(e.message)
+        return
+    }
+    response.status(200).send("Grocery Store " + groceryStore.getId() + " Account Updated");
 });
 
-//Update inventory of a store
-app.post("/groceryStore/inventoryUpdate", (request, response) => {
-    var newEdiOrder = new EdiOrder.EdiOrder(request.body);
-    groceryStoreDao.newInventoryToGroceryStoreData(newEdiOrder);
-    response.status(200).send("Inventory updated in Firestore");
+app.post("/groceryStore/updateInventory", async (request, response) => {
+    try {
+        var ediOrder = await groceryStoreService.createEDIOrder(request.body);
+        groceryStoreService.updateInventory(ediOrder);
+    }
+    catch (e) {
+        response.status(202).send(e.message)
+        return
+    }
+    response.status(200).send("Grocery Store " + ediOrder.getGroceryStoreId() + " Inventory Updated");
 });
 
 /*****************Driver EndPoint **********************/
 
-app.post("/driver/driverStatusUpdate", (request, response) => {
-    var driverId = request.body.driverId;
-    var updateDriverStatus = request.body.updateDriverStatus;
-
-    driverDao.updateDriverStatus(driverId, updateDriverStatus); 
-    response.status(200).send("Driver Id: " + driverId +
-        "\n New Status: " + updateDriverStatus);
+app.post("/driver/statusUpdate", async (request, response) => {
+    try {
+        await driverService.updateDriverStatus(request.body.id, request.body.status);
+    }
+    catch (e) {
+        response.status(202).send(e.message)
+        return
+    }
+    response.status(200).send("Driver " + request.body.id + " New Status: " + request.body.status);
 
 });
 
-app.post("/driver/updateUserAccount", (request, response) => {
-    var driver = new Driver.Driver(request.body);
-    let driverId = driverDao.generateUniqueKey();
-    driver.setDriverId(driverId);
-
-    //initalize driver object
-    driverDao.updateDriverAccount(driver);
-    response.status(200).send("Driver Id: " + driver.driverId +
-        " created");
-
+app.post("/driver/updateUserAccount", async (request, response) => {
+    try {
+        var driver = await driverService.createDriver(request.body, false);
+        driverService.updateDriverAccount(driver);
+    }
+    catch (e) {
+        response.status(202).send(e.message)
+        return
+    }
+    response.status(200).send("Driver " + driver.getId() + " Account Updated");
 });
 
 exports.app = functions.https.onRequest(app);

@@ -1,0 +1,14 @@
+{
+    "groceryStoreId": "6773",
+    "ediOrderNumber": "124AZ",
+    "inventory":  [
+        {
+            "id": 1234,
+            "name": "apple",
+            "brand": "FruitCo",
+            "groceryStoreId": 3948,
+            "quantity": 15,
+            "expirationDate": "02-03-21"
+        }
+    ]
+}
