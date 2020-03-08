@@ -7,6 +7,8 @@ const express = require("express")
 const cors = require('cors');
 const app = express();
 app.use(cors());
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 
 //Services Imports
 const UniqueIdService = require("./Services/UniqueIdService");
@@ -152,7 +154,7 @@ app.post("/driver/updateUserAccount", async (request, response) => {
 
 app.post("/login/createAccount", async (request, response) => {
     try {
-        var res = await loginService.createAcount(request.query.username, request.query.password, request.query.type);
+        var res = await loginService.createAcount(request.body.username, request.body.password, request.body.type);
         if (res[0]) {
             response.status(200).send(res[1]);
         } else {
@@ -166,7 +168,7 @@ app.post("/login/createAccount", async (request, response) => {
 
 app.post("/login/authenticate", async (request, response) => {
     try {
-        var res = await loginService.authenticate(request.query.username, request.query.password);
+        var res = await loginService.authenticate(request.body.username, request.body.password);
         if (res[0]) {
             response.cookie("uid", res[1]);
             response.status(200).send("Login Successfully");
