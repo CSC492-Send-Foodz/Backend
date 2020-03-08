@@ -1,23 +1,23 @@
 
 class UniqueIdService {
-    constructor (DB){
+    constructor(DB) {
         this.DB = DB
     }
 
-    generateUniqueKey(path) {
+    generateUniqueKey(path,name) {
         let dbKeys = [];
+        var element = name===undefined?name:"id";
+        //get all keys in firebase and check they don't coincide with key
+        let collection = this.DB.collection(path);
 
-        //get all keys in firebase and check they don"t coincide with key
-        let ordersRef = this.DB.collection(path);
-
-        ordersRef.get().then(snapshot => {
+        collection.get().then(snapshot => {
             snapshot.forEach(doc => {
-                dbKeys.push(doc.id);
+                dbKeys.push(doc[element]);
             });
-        })
-            .catch(err => {
-                console.log("Error getting documents", err);
-            });
+            return true;
+        }).catch(err => {
+            console.log("Error getting documents", err);
+        });
 
         return this._getKeyUnique(dbKeys);
     }
