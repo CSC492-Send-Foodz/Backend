@@ -13,7 +13,7 @@ class LoginService {
                 docRef.set({
                     "password": password,
                     "type": type,
-                    "uid": this.uniqueIdService.generateUniqueKey("Accounts")
+                    "uid": this.uniqueIdService.generateUniqueKey("Accounts","uid")
                 });
                 return [true, "Account sucessfully created"];
             }
