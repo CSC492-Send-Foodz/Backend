@@ -10,12 +10,9 @@ class UniqueIdService {
         //get all keys in firebase and check they don't coincide with key
         let collection = this.DB.collection(path);
 
-        //get all keys in firebase and check they don't coincide with key
-        let collection = this.DB.collection(path);
-
         collection.get().then(snapshot => {
             snapshot.forEach(doc => {
-                dbKeys.push(doc.uid);
+                dbKeys.push(doc[element]);
             });
             return true;
         }).catch(err => {
