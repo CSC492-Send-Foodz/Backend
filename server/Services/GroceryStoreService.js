@@ -9,8 +9,6 @@ class GroceryStoreService {
 		this.uniqueIdService = uniqueIdService;
         this.collectionQuery = "GroceryStores";
         this._GroceryStoresCollectionQuery = DB.collection(this.collectionQuery);
-
-        this.initGroceryStoreListener()
 	}
 
 	async createGroceryStore(groceryStoreRef) {
@@ -22,9 +20,6 @@ class GroceryStoreService {
 
         if (groceryStoreRef.id !== undefined) await AssertRequestValid.assertValidGroceryStore(this.groceryStoreDao, groceryStore.getId())
         AssertRequestValid.assertObjectValid(groceryStore);
-
-        this._initGroceryStoreListener(groceryStore.getId())
-        
         return groceryStore;
     }
 
@@ -51,22 +46,8 @@ class GroceryStoreService {
         this.groceryStoreDao.updateInventory(editOrder);
     }
 
-    initGroceryStoreListener() {
-        this._GroceryStoresCollectionQuery.get().then(groceryStores => { 
-            groceryStores.docs.forEach(groceryStore => {
-                this._initGroceryStoreListener(groceryStore.id);
-            });
-        })
-    }
-    
-    _initGroceryStoreListener(id) {
-        this._GroceryStoresCollectionQuery.doc(`${id}`).collection("InventoryCollection").doc("Items")
-        .onSnapshot(groceryStoreSnapshot => {
-            // console.log(groceryStoreSnapshot)
-            // if (groceryStoreSnapshot.data() !== undefined && (groceryStoreSnapshot.type === "added" || groceryStoreSnapshot.type === "modified")) {
-            //     console.log("Grocery Store " + id + " with inventory: ", groceryStoreSnapshot.data())
-            // }
-        });
+    deleteInventoryItem(id, groceryStoreId){
+        this.groceryStoreDao.deleteInventoryItem(id, groceryStoreId);
     }
 }
 
