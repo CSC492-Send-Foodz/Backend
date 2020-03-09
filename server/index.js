@@ -14,6 +14,7 @@ const OrderProcessor = require("./Services/OrderProcessor");
 const FoodBankService = require("./Services/FoodBankService");
 const DriverService = require("./Services/DriverService");
 const GroceryStoreService = require("./Services/GroceryStoreService");
+const LoginService = require("./Services/LoginService")
 
 //Daos Imports
 const FoodBankDao = require('./DataAccessObjects/FoodBankDao');
@@ -27,7 +28,7 @@ var DB = admin.firestore();
 
 //Initialize Daos
 var orderDao = new OrderDao.OrderDao(DB);
-var groceryStoreDao = new GroceryStoreDao.GroceryStoreDao(DB);
+var groceryStoreDao = new GroceryStoreDao.GroceryStoreDao(DB, admin);
 var driverDao = new DriverDao.DriverDao(DB);
 var foodBankDao = new FoodBankDao.FoodBankDao(DB);
 
@@ -37,6 +38,7 @@ var foodBankService = new FoodBankService.FoodBankService(foodBankDao, uniqueIdS
 var driverService = new DriverService.DriverService(DB, driverDao, uniqueIdService, orderDao);
 var groceryStoreService = new GroceryStoreService.GroceryStoreService(DB, groceryStoreDao, uniqueIdService);
 var orderProcessor = new OrderProcessor.OrderProcessor(DB, orderDao, groceryStoreDao, driverDao, foodBankDao, uniqueIdService);
+var loginService = new LoginService.LoginService(DB, uniqueIdService);
 
 
 
@@ -45,7 +47,7 @@ exports.pruneDaily = functions.pubsub.schedule('0 0 * * *').onRun((context) => {
     return null;
 });
 /*******************Order EndPoint *************************/
-app.post("/order/statusUpdate", async(request, response) => {
+app.post("/order/statusUpdate", async (request, response) => {
     try {
         await orderProcessor.updateActiveOrderStatus(request.body.id, request.body.status);
     }
@@ -60,7 +62,7 @@ app.post("/order/statusUpdate", async(request, response) => {
 
 
 /*******************Food Bank EndPoint *************************/
-app.post("/foodBank/placeOrder", async(request, response) => {
+app.post("/foodBank/placeOrder", async (request, response) => {
     try {
         var order = await orderProcessor.createOrder(request.body);
         await orderProcessor.processOrder(order);
@@ -72,7 +74,7 @@ app.post("/foodBank/placeOrder", async(request, response) => {
     response.status(200).send("Order Id " + order.getId() + " status is " + order.getStatus());
 });
 
-app.post('/foodBank/updateUserAccount',  async (request, response) => {
+app.post('/foodBank/updateUserAccount', async (request, response) => {
     try {
         var foodBank = await foodBankService.createFoodBank(request.body);
         foodBankService.updateFoodBankAccount(foodBank);
@@ -109,6 +111,17 @@ app.post("/groceryStore/updateInventory", async (request, response) => {
     response.status(200).send("Grocery Store " + ediOrder.getGroceryStoreId() + " Inventory Updated");
 });
 
+app.post("/groceryStore/removeInventoryItem", async (request, response) => {
+    try {
+        groceryStoreService.deleteInventoryItem(request.body.id, request.body.groceryStoreId);
+    }
+    catch (e) {
+        response.status(202).send(e.message)
+        return
+    }
+    response.status(200).send("Grocery Store Inventory Item" + request.body.id + " Deleted");
+});
+
 /*****************Driver EndPoint **********************/
 
 app.post("/driver/statusUpdate", async (request, response) => {
@@ -133,6 +146,37 @@ app.post("/driver/updateUserAccount", async (request, response) => {
         return
     }
     response.status(200).send("Driver " + driver.getId() + " Account Updated");
+});
+
+/*****************Login EndPoint **********************/
+
+app.post("/login/createAccount", async (request, response) => {
+    try {
+        var res = await loginService.createAcount(request.query.username, request.query.password, request.query.type);
+        if (res[0]) {
+            response.status(200).send(res[1]);
+        } else {
+            response.status(200).send(res[1]);
+        }
+    } catch (e) {
+        response.status(202).send(e.message)
+        return
+    }
+});
+
+app.post("/login/authenticate", async (request, response) => {
+    try {
+        var res = await loginService.authenticate(request.query.username, request.query.password);
+        if (res[0]) {
+            response.cookie("uid", res[1]);
+            response.status(200).send("Login Successfully");
+        } else {
+            response.status(200).send("Login Failed");
+        }
+    } catch (e) {
+        response.status(202).send(e.message)
+        return
+    }
 });
 
 exports.app = functions.https.onRequest(app);
