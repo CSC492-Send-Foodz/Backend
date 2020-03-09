@@ -28,7 +28,7 @@ var DB = admin.firestore();
 
 //Initialize Daos
 var orderDao = new OrderDao.OrderDao(DB);
-var groceryStoreDao = new GroceryStoreDao.GroceryStoreDao(DB);
+var groceryStoreDao = new GroceryStoreDao.GroceryStoreDao(DB, admin);
 var driverDao = new DriverDao.DriverDao(DB);
 var foodBankDao = new FoodBankDao.FoodBankDao(DB);
 
@@ -109,6 +109,17 @@ app.post("/groceryStore/updateInventory", async (request, response) => {
         return
     }
     response.status(200).send("Grocery Store " + ediOrder.getGroceryStoreId() + " Inventory Updated");
+});
+
+app.post("/groceryStore/removeInventoryItem", async (request, response) => {
+    try {
+        groceryStoreService.deleteInventoryItem(request.body.id, request.body.groceryStoreId);
+    }
+    catch (e) {
+        response.status(202).send(e.message)
+        return
+    }
+    response.status(200).send("Grocery Store Inventory Item" + request.body.id + " Deleted");
 });
 
 /*****************Driver EndPoint **********************/

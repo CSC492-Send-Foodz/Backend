@@ -1,8 +1,15 @@
 const EdiOrder = require("../Models/EdiOrder");
 
 class GroceryStoreDao {
-    constructor(DB) {
+    constructor(DB, firebase) {
         this.DB = DB;
+        this.firebase = firebase;
+    }
+
+    deleteInventoryItem(id, groceryStoreId) {
+        this.DB.collection("GroceryStores").doc(`${groceryStoreId}`).collection("InventoryCollection").doc("Items").update({
+            [id]: this.firebase.firestore.FieldValue.delete()
+        })
     }
 
     async getGroceryStoreData(groceryStoreId) {
@@ -12,8 +19,8 @@ class GroceryStoreDao {
 
     updateInventory(ediOrder) {
         return this.DB.collection("GroceryStores").doc(ediOrder.getGroceryStoreId()).collection("InventoryCollection").doc("Items")
-        .set(JSON.parse(JSON.stringify(ediOrder.getInventory())),
-            { merge: true });
+            .set(JSON.parse(JSON.stringify(ediOrder.getInventory())),
+                { merge: true });
     }
 
     updateGroceryStoreData(groceryStore) {
@@ -27,15 +34,14 @@ class GroceryStoreDao {
 
     isOrderValid(order) {
         return this.DB.collection("GroceryStores").doc(order.getGroceryStoreId()).collection("InventoryCollection").doc("Items")
-        .get().then(groceryStoreInventory => {
-            for (const [itemId, item] of Object.entries(order.getInventory())) {
-                if (item.getQuantity() > Number(groceryStoreInventory.data()[itemId]["quantity"])) return false;
-            }
-            this.updateStoreInventoryQuantity(order.getGroceryStoreId(), order.getInventory(), groceryStoreInventory.data())
-            return true;
-        });
+            .get().then(groceryStoreInventory => {
+                for (const [itemId, item] of Object.entries(order.getInventory())) {
+                    if (item.getQuantity() > Number(groceryStoreInventory.data()[itemId]["quantity"])) return false;
+                }
+                this.updateStoreInventoryQuantity(order.getGroceryStoreId(), order.getInventory(), groceryStoreInventory.data())
+                return true;
+            });
     }
-
 
     updateStoreInventoryQuantity(groceryStoreId, orderInventory, groceryStoreInventory) {
         var updateItems = {};
