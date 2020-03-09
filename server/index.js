@@ -154,7 +154,7 @@ app.post("/driver/updateUserAccount", async (request, response) => {
 
 app.post("/login/createAccount", async (request, response) => {
     try {
-        var res = await loginService.createAcount(request.body.username, request.body.password, request.body.type);
+        var res = await loginService.createAcount(request.body.email, request.body.password, request.body.type);
         if (res[0]) {
             response.status(200).send(res[1]);
         } else {
@@ -168,14 +168,15 @@ app.post("/login/createAccount", async (request, response) => {
 
 app.post("/login/authenticate", async (request, response) => {
     try {
-        var res = await loginService.authenticate(request.body.username, request.body.password);
+        var res = await loginService.authenticate(request.body.email, request.body.password);
         if (res[0]) {
-            response.cookie("uid", res[1]);
+            response.cookie("send-foodz-uid", res[1]);
             response.status(200).send("Login Successfully");
         } else {
-            response.status(200).send("Login Failed");
+            response.status(200).send(res[1]);
         }
     } catch (e) {
+        console.log("Error");
         response.status(202).send(e.message)
         return
     }

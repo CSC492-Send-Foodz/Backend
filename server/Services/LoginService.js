@@ -8,17 +8,17 @@ class LoginService {
         var docRef = this.accountsCollection.doc(username);
         return docRef.get().then(doc => {
             if (doc.exists) {
-                return [false, "Username Exists already"];
+                return [false, "ERROR: Username Exists already"];
             } else {
                 docRef.set({
                     "password": password,
                     "type": type,
                     "uid": this.uniqueIdService.generateUniqueKey("Accounts","uid")
                 });
-                return [true, "Account sucessfully created"];
+                return [true, "OK: Account sucessfully created"];
             }
-        }).catch(error => {
-            console.log("Error retrieving document");
+        }).catch(e => {
+            console.log(e.message);
         });
     }
 
@@ -29,7 +29,7 @@ class LoginService {
             if (doc.exists && data.password === password) {
                 return [true, data.uid];
             } else {
-                return [false, "login failed"];
+                return [false, "ERROR: Login Failed"];
             }
         })
     }
