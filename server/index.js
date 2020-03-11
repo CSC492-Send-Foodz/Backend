@@ -155,13 +155,9 @@ app.post("/driver/updateUserAccount", async (request, response) => {
 app.post("/login/createAccount", async (request, response) => {
     try {
         var res = await loginService.createAcount(request.body.email, request.body.password, request.body.type);
-        if (res[0]) {
-            response.status(200).send(res[1]);
-        } else {
-            response.status(200).send(res[1]);
-        }
+        response.status(200).send(res);
     } catch (e) {
-        response.status(202).send(e.message)
+        response.status(400).send(e.message)
         return
     }
 });
@@ -170,14 +166,13 @@ app.post("/login/authenticate", async (request, response) => {
     try {
         var res = await loginService.authenticate(request.body.email, request.body.password);
         if (res[0]) {
-            response.cookie("send-foodz-uid", res[1]);
-            response.status(200).send("Login Successfully");
+            res = res[1];
+            response.status(200).send({ "message": "OK", "id": res[0], "email": request.body.email, "type": res[1] });
         } else {
-            response.status(200).send(res[1]);
+            response.status(200).send({ "message": res[1] })
         }
     } catch (e) {
-        console.log("Error");
-        response.status(202).send(e.message)
+        response.status(400).send(e.message)
         return
     }
 });

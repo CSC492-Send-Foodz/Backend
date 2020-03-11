@@ -4,15 +4,14 @@ class UniqueIdService {
         this.DB = DB
     }
 
-    generateUniqueKey(path,name) {
+    generateUniqueKey(path) {
         let dbKeys = [];
-        var element = name===undefined?name:"id";
         //get all keys in firebase and check they don't coincide with key
         let collection = this.DB.collection(path);
 
         collection.get().then(snapshot => {
             snapshot.forEach(doc => {
-                dbKeys.push(doc[element]);
+                dbKeys.push(doc.id);
             });
             return true;
         }).catch(err => {

@@ -1,37 +1,65 @@
+const TYPES = { "GroceryStores": "Grocery Store", "FoodBank": "Food Bank", "Drivers": "Driver" };
+
 class LoginService {
     constructor(dbRef, uniqueIdService) {
-        this.accountsCollection = dbRef.collection("Accounts");
+        this.db = dbRef;
         this.uniqueIdService = uniqueIdService;
     }
 
-    async createAcount(username, password, type) {
-        var docRef = this.accountsCollection.doc(username);
-        return docRef.get().then(doc => {
-            if (doc.exists) {
-                return [false, "ERROR: Username Exists already"];
-            } else {
-                docRef.set({
-                    "password": password,
-                    "type": type,
-                    "uid": this.uniqueIdService.generateUniqueKey("Accounts","uid")
-                });
-                return [true, "OK: Account sucessfully created"];
+    async createAcount(email, password, type) {
+        if (TYPES[type] !== undefined) {
+            if (await this._checkEmailInUse(email)) {
+                return "ERROR: Email exists already";
             }
-        }).catch(e => {
-            console.log(e.message);
+            var id = this.uniqueIdService.generateUniqueKey(type);
+            var docRef = this.db.collection(type).doc(id.toString());
+            return docRef.get().then(doc => {
+                docRef.set({
+                    "email":email,
+                    "password": password,
+                    "type": TYPES[type],
+                }, { merge: true });
+                return "OK: Account sucessfully created";
+            }).catch(e => {
+                console.log(e.message);
+            });
+        } else {
+            return "ERROR: Type - " + type + " does not exist";
+        }
+    }
+
+    async _checkEmailInUse(email) {
+        var promises = [];
+        for (let type in TYPES) {
+            promises.push(this.db.collection(type).where("email", "==", email).get());
+        }
+        return Promise.all(promises).then(res => {
+            for (var i = 0; i < res.length; i++) {
+                if (res[i].docs.length !== 0) {
+                    return true;
+                }
+            }
+            return false;
         });
     }
 
-    async authenticate(username, password) {
-        var docRef = this.accountsCollection.doc(username);
-        return docRef.get().then(doc => {
-            var data = doc.data();
-            if (doc.exists && data.password === password) {
-                return [true, data.uid];
-            } else {
-                return [false, "ERROR: Login Failed"];
+    async authenticate(email, password) {
+        var promises = [];
+        for (let type in TYPES) {
+            promises.push(this.db.collection(type).where("email", "==", email).get());
+        }
+        return Promise.all(promises).then(queryResults => {
+            for (var i = 0; i < queryResults.length; i++) {
+                var docs = queryResults[i].docs;
+                if (docs.length === 1) {
+                    if (docs[0].data().password === password) {
+                        var path = docs[0].ref.path;
+                        return [true, [docs[0].id, TYPES[path.substring(0, path.indexOf("/"))]]];
+                    }
+                }
             }
-        })
+            return [false, "ERROR: Login Failed"];
+        });
     }
 }
 
