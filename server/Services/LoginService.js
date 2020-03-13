@@ -1,4 +1,4 @@
-const TYPES = { "GroceryStores": "Grocery Store", "FoodBank": "Food Bank", "Drivers": "Driver" };
+const TYPES = { "GroceryStores": "Grocery Store", "FoodBanks": "Food Bank", "Drivers": "Driver" };
 
 class LoginService {
     constructor(dbRef, uniqueIdService) {
