@@ -4,21 +4,20 @@ const Item = require("../Models/Item");
 const AssertRequestValid = require("./AssertObjectValid");
 
 class GroceryStoreService {
-	constructor(DB, groceryStoreDao, uniqueIdService) {
-		this.groceryStoreDao = groceryStoreDao;
-		this.uniqueIdService = uniqueIdService;
+    constructor(DB, groceryStoreDao, uniqueIdService) {
+        this.groceryStoreDao = groceryStoreDao;
+        this.uniqueIdService = uniqueIdService;
         this.collectionQuery = "GroceryStores";
         this._GroceryStoresCollectionQuery = DB.collection(this.collectionQuery);
 	}
 
-	async createGroceryStore(groceryStoreRef) {
+    async createGroceryStore(groceryStoreRef) {
         var groceryStore = new GroceryStore.GroceryStore(
-            groceryStoreRef.id === undefined ? this.uniqueIdService.generateUniqueKey(this.collectionQuery) : groceryStoreRef.id,
+            groceryStoreRef.id,
             groceryStoreRef.storeNumber,
-			groceryStoreRef.address,
-			groceryStoreRef.company);
+            groceryStoreRef.address,
+            groceryStoreRef.company);
 
-        if (groceryStoreRef.id !== undefined) await AssertRequestValid.assertValidGroceryStore(this.groceryStoreDao, groceryStore.getId())
         AssertRequestValid.assertObjectValid(groceryStore);
         return groceryStore;
     }
@@ -29,9 +28,9 @@ class GroceryStoreService {
 
     async createEDIOrder(ediOrderRef) {
         var ediOrder = new EdiOrder.EdiOrder(ediOrderRef.groceryStoreId, ediOrderRef.ediOrderNumber,
-             this._processEDIOrderInventory(ediOrderRef.inventory, ediOrderRef.ediOrderNumber));
-        if (ediOrderRef.groceryStoreId !== undefined) await AssertRequestValid.assertValidGroceryStore(this.groceryStoreDao, ediOrderRef.groceryStoreId)
+            this._processEDIOrderInventory(ediOrderRef.inventory, ediOrderRef.ediOrderNumber));
         AssertRequestValid.assertObjectValid(ediOrder);
+        await AssertRequestValid.assertValidGroceryStore(this.groceryStoreDao, ediOrderRef.groceryStoreId);
         return ediOrder
     }
 
@@ -52,7 +51,7 @@ class GroceryStoreService {
 }
 
 module.exports = {
-	GroceryStoreService
+    GroceryStoreService
 };
 
 

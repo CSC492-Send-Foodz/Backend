@@ -7,6 +7,8 @@ const express = require("express")
 const cors = require('cors');
 const app = express();
 app.use(cors());
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 
 //Services Imports
 const UniqueIdService = require("./Services/UniqueIdService");
@@ -152,29 +154,25 @@ app.post("/driver/updateUserAccount", async (request, response) => {
 
 app.post("/login/createAccount", async (request, response) => {
     try {
-        var res = await loginService.createAcount(request.query.username, request.query.password, request.query.type);
-        if (res[0]) {
-            response.status(200).send(res[1]);
-        } else {
-            response.status(200).send(res[1]);
-        }
+        var res = await loginService.createAcount(request.body.email, request.body.password, request.body.type);
+        response.status(200).send(res);
     } catch (e) {
-        response.status(202).send(e.message)
+        response.status(400).send(e.message)
         return
     }
 });
 
 app.post("/login/authenticate", async (request, response) => {
     try {
-        var res = await loginService.authenticate(request.query.username, request.query.password);
+        var res = await loginService.authenticate(request.body.email, request.body.password);
         if (res[0]) {
-            response.cookie("uid", res[1]);
-            response.status(200).send("Login Successfully");
+            res = res[1];
+            response.status(200).send({ "message": "OK", "id": res[0], "email": request.body.email, "type": res[1] });
         } else {
-            response.status(200).send("Login Failed");
+            response.status(200).send({ "message": res[1] })
         }
     } catch (e) {
-        response.status(202).send(e.message)
+        response.status(400).send(e.message)
         return
     }
 });
