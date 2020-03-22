@@ -10,14 +10,14 @@ class FoodBankService {
 
     async createFoodBank(foodBankRef) {
         var foodBank = new FoodBank.FoodBank(
-            foodBankRef.id === undefined ? this.uniqueIdService.generateUniqueKey(this.collectionQuery) : foodBankRef.id,
+            foodBankRef.id,
             foodBankRef.name,
             foodBankRef.name,
             foodBankRef.locationId);
 
-        if (foodBankRef.id !== undefined) await AssertRequestValid.assertValidFoodBank(this.foodBankDao, foodBank.getId())
         AssertRequestValid.assertObjectValid(foodBank);
-        
+        if (foodBankRef.id !== undefined) await AssertRequestValid.assertValidFoodBank(this.foodBankDao, foodBank.getId())
+
         return foodBank;
     }
 
