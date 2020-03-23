@@ -52,13 +52,13 @@ class OrderProcessor {
             case "Able to completed":
                 return Order.OrderStates.VALID;
 
-            case "Driver on the way to pick up inventory from the grocery store":
+            case "Driver on route for pick up":
                 return Order.OrderStates.PICKUP_IN_PROGRESS;
 
-            case "Driver has picked up inventory from the grocery store.":
+            case "Inventory picked up":
                 return Order.OrderStates.DROP_OFF_IN_PROGRESS;
 
-            case "Driver has dropped off the inventory at the food bank":
+            case "Inventory Delivered":
                 return Order.OrderStates.DELIVERED;
 
             default:
