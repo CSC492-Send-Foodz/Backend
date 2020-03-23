@@ -48,10 +48,7 @@ class OrderProcessor {
 
             case "Unable to completed":
                 return Order.OrderStates.UNABLE_TO_COMPLETE;
-
-            case "Able to completed":
-                return Order.OrderStates.VALID;
-
+                
             case "Driver on route for pick up":
                 return Order.OrderStates.PICKUP_IN_PROGRESS;
 

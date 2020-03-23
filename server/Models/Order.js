@@ -1,7 +1,6 @@
 const OrderStates = {
     LOOKING_FOR_DRIVER: "Looking For Driver",
     UNABLE_TO_COMPLETE: "Order is unable to completed",
-    VALID: "Order is able to completed",
     PICKUP_IN_PROGRESS: "Driver on route for pick up",
     DROP_OFF_IN_PROGRESS: "Inventory picked up",
     DELIVERED: "Inventory Delivered",
