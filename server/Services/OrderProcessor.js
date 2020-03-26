@@ -17,7 +17,6 @@ class OrderProcessor {
 
     async createOrder(orderRef) {
         var inventory = this._processOrderInventory(orderRef.inventory);
-        console.log("this is working");
         var order = new Order.Order(this.uniqueIdService.generateUniqueKey("Orders"), this._setOrderStatus(orderRef.status), orderRef.groceryStoreId, orderRef.foodBankId,
             null, Date(orderRef.time), inventory, this._processOrderQuantity(inventory));
         if (orderRef.groceryStoreId !== undefined) await AssertRequestValid.assertValidGroceryStore(this.groceryStoreDao, orderRef.groceryStoreId)
@@ -35,7 +34,6 @@ class OrderProcessor {
     }
 
     _processOrderQuantity(inventory) {
-        console.log("got to this point" + inventory.quantity)
         var totalQuantity = 0;
         for (const [itemId, item] of Object.entries(inventory)) {
             totalQuantity += Number(item.getQuantity());
