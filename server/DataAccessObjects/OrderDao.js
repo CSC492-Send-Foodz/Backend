@@ -16,7 +16,7 @@ class OrderDao {
             console.log("Failed to update order " + orderId)
             // eslint-disable-next-line promise/always-return
         }).then(() => {
-            console.log("Active order " + orderId + " status updated")
+            console.log("Active order " + orderId + " updated to status: " + newStatus)
         });
 
     }
