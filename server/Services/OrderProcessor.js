@@ -17,6 +17,7 @@ class OrderProcessor {
 
     async createOrder(orderRef) {
         var inventory = this._processOrderInventory(orderRef.inventory);
+        console.log("this is working");
         var order = new Order.Order(this.uniqueIdService.generateUniqueKey("Orders"), this._setOrderStatus(orderRef.status), orderRef.groceryStoreId, orderRef.foodBankId,
             null, Date(orderRef.time), inventory, this._processOrderQuantity(inventory));
         if (orderRef.groceryStoreId !== undefined) await AssertRequestValid.assertValidGroceryStore(this.groceryStoreDao, orderRef.groceryStoreId)
@@ -34,6 +35,7 @@ class OrderProcessor {
     }
 
     _processOrderQuantity(inventory) {
+        console.log("got to this point" + inventory.quantity)
         var totalQuantity = 0;
         for (const [itemId, item] of Object.entries(inventory)) {
             totalQuantity += Number(item.getQuantity());
@@ -52,13 +54,13 @@ class OrderProcessor {
             case "Able to completed":
                 return Order.OrderStates.VALID;
 
-            case "Driver on the way to pick up inventory from the grocery store":
+            case "Driver on route for pick up":
                 return Order.OrderStates.PICKUP_IN_PROGRESS;
 
-            case "Driver has picked up inventory from the grocery store.":
+            case "Inventory picked up":
                 return Order.OrderStates.DROP_OFF_IN_PROGRESS;
 
-            case "Driver has dropped off the inventory at the food bank":
+            case "Inventory Delivered":
                 return Order.OrderStates.DELIVERED;
 
             default:
