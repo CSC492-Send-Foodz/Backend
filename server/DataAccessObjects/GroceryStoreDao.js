@@ -47,17 +47,24 @@ class GroceryStoreDao {
         var updateItems = {};
         for (const [itemId, item] of Object.entries(orderInventory)) {
             var remainingQuantity = Number(groceryStoreInventory[itemId]["quantity"]) - item.getQuantity();
-            updateItems[item.getId()] = {
-                "id": item.getId(),
-                "name": item.getName(),
-                "brand": item.getBrand(),
-                "groceryStoreId": item.getGroceryStoreId(),
-                "quantity": remainingQuantity,
-                "expirationDate": item.getExpirationDate(),
-                "ediOrderNumber": item.getEdiOrderNumber()
-            };
+            if (remainingQuantity == 0) {
+                this.deleteInventoryItem(item.getId(), item.getGroceryStoreId())
+            } else {
+                updateItems[item.getId()] = {
+                    "id": item.getId(),
+                    "name": item.getName(),
+                    "brand": item.getBrand(),
+                    "groceryStoreId": item.getGroceryStoreId(),
+                    "quantity": remainingQuantity,
+                    "expirationDate": item.getExpirationDate(),
+                    "ediOrderNumber": item.getEdiOrderNumber()
+                };
+            }
         }
-        this.DB.collection("GroceryStores").doc(groceryStoreId).collection("InventoryCollection").doc("Items").update(updateItems);
+        if (Object.keys(updateItems).length != 0) {
+            this.DB.collection("GroceryStores").doc(groceryStoreId).collection("InventoryCollection").doc("Items").update(updateItems);
+        }
+
     }
 
 

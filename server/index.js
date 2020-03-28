@@ -44,10 +44,10 @@ var loginService = new LoginService.LoginService(DB, uniqueIdService);
 
 
 
-exports.pruneDaily = functions.pubsub.schedule('0 0 * * *').onRun((context) => {
-    groceryStoreDao.pruneInventory();
-    return null;
-});
+// exports.pruneDaily = functions.pubsub.schedule('0 0 * * *').onRun((context) => {
+//     groceryStoreDao.pruneInventory();
+//     return null;
+// });
 /*******************Order EndPoint *************************/
 app.post("/order/statusUpdate", async (request, response) => {
     try {
@@ -73,7 +73,7 @@ app.post("/foodBank/placeOrder", async (request, response) => {
         response.status(202).send(e.message)
         return
     }
-    response.status(200).send("Order Id " + order.getId() + " status is " + order.getStatus());
+    response.status(200).send({id: order.getId(), status:order.getStatus()});
 });
 
 app.post('/foodBank/updateUserAccount', async (request, response) => {
