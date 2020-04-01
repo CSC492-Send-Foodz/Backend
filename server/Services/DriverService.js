@@ -42,6 +42,9 @@ class DriverService {
             drivers.docs.forEach(driver => {
                 this._initDriverListener(driver.id);
             });
+            return true;
+        }).catch(error=>{
+            console.log(error);
         })
     }
 

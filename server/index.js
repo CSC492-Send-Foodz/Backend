@@ -44,10 +44,10 @@ var groceryStoreService = new GroceryStoreService.GroceryStoreService(DB, grocer
 var orderProcessor = new OrderProcessor.OrderProcessor(DB, orderDao, groceryStoreDao, driverDao, foodBankDao, uniqueIdService);
 
 
-exports.pruneDaily = functions.pubsub.schedule('0 0 * * *').onRun((context) => {
+/*exports.pruneDaily = functions.pubsub.schedule('0 0 * * *').onRun((context) => {
     groceryStoreDao.pruneInventory();
     return null;
-});
+});*/
 
 const validateFirebaseIdToken = async(req,res,next)=>{
     AuthenticationService.checkRequestAuth(admin,req,res,next);

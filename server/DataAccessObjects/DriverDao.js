@@ -10,7 +10,10 @@ class DriverDao {
             snapshot.forEach(doc => {
                 activeOrder.notifyDriver(doc.data()["id"])
             });
-        })
+            return true;
+        }).catch(error=>{
+            console.log(error);
+        });
     }
 
     async getDriverAccountData(driverId){

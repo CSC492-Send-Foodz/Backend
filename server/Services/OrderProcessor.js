@@ -21,7 +21,7 @@ class OrderProcessor {
             null, Date(orderRef.time), inventory, this._processOrderQuantity(inventory));
         if (orderRef.groceryStoreId !== undefined) await AssertRequestValid.assertValidGroceryStore(this.groceryStoreDao, orderRef.groceryStoreId)
         if (orderRef.foodBankId !== undefined) await AssertRequestValid.assertValidFoodBank(this.foodBankDao, orderRef.foodBankId)
-        
+
         AssertRequestValid.assertObjectValid(order);
         return order
     }
@@ -48,7 +48,7 @@ class OrderProcessor {
 
             case "Unable to completed":
                 return Order.OrderStates.UNABLE_TO_COMPLETE;
-                
+
             case "Driver on route for pick up":
                 return Order.OrderStates.PICKUP_IN_PROGRESS;
 
@@ -63,10 +63,13 @@ class OrderProcessor {
         }
     }
     initOrderListener() {
-        this._orderQuery.get().then(activeOrders => { 
+        this._orderQuery.get().then(activeOrders => {
             activeOrders.docs.forEach(activeOrder => {
                 this._initOrderListener(activeOrder.id);
             });
+            return true;
+        }).catch(error => {
+            console.log(error);
         })
     }
 
@@ -82,15 +85,15 @@ class OrderProcessor {
                     case "Looking For Driver":
                         this.driverDao.notifyAllValidDrivers(order);
                         return
-        
+
                     case "In Progress":
                         console.log('Advanced Shipping Notice - drivers');
                         console.log('Advanced Shipping Notice - grocery');
-                        return 
-        
+                        return
+
                     case "Picked Up":
                         console.log('Order ' + order.getId() + ' received');
-                        return 
+                        return
                 }
             }
         });
@@ -102,20 +105,25 @@ class OrderProcessor {
                 this.orderDao.addToOrders(order).then(
                     res => {
                         if (res.writeTime !== undefined) this._initOrderListener(order.getId());
+                        return;
+                        
+                    }).catch(error=>{
+                        console.log(error);
                     });
-                order.setStatus(Order.OrderStates.LOOKING_FOR_DRIVER)
+                order.setStatus(Order.OrderStates.LOOKING_FOR_DRIVER);
             }
-            else{
-                order.setStatus(Order.OrderStates.UNABLE_TO_COMPLETE)
+            else {
+                order.setStatus(Order.OrderStates.UNABLE_TO_COMPLETE);
             }
+            return true;
         })
     }
 
-    async updateActiveOrderStatus(orderId, status){
-        if(orderId !== undefined) await AssertRequestValid.assertValidActiveOrder(this.orderDao, orderId)
+    async updateActiveOrderStatus(orderId, status) {
+        if (orderId !== undefined) await AssertRequestValid.assertValidActiveOrder(this.orderDao, orderId)
         this.orderDao.updateActiveOrderStatus(orderId, this._setOrderStatus(status));
     }
-   
+
 }
 
 module.exports = {

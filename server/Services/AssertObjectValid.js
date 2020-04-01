@@ -23,33 +23,37 @@ function assertObjectValid(object) {
 function assertValidFoodBank(foodBankIdDao, id) {
     return foodBankIdDao.getFoodBankAccountData(id).then((doc) => {
         if (!doc.exists) {
-            throw new InvalidAccountId(id)
+            throw new InvalidAccountId(id);
         }
-    })
+        return true;
+    });
 }
 
 function assertValidDriver(driverDao, id) {
     return driverDao.getDriverAccountData(id).then((doc) => {
         if (!doc.exists) {
-            throw new InvalidAccountId(id)
+            throw new InvalidAccountId(id);
         }
-    })
+        return true;
+    });
 }
 
 function assertValidGroceryStore(groceryStoreDao, id) {
     return groceryStoreDao.getGroceryStoreData(id).then((doc) => {
         if (!doc.exists) {
-            throw new InvalidAccountId(id)
+            throw new InvalidAccountId(id);
         }
-    })
+        return true;
+    });
 }
 
-function assertValidActiveOrder(orderDao, id){
+function assertValidActiveOrder(orderDao, id) {
     return orderDao.getOrders(id).then((doc) => {
         if (!doc.exists) {
-            throw new InvalidAccountId(id)
+            throw new InvalidAccountId(id);
         }
-    })
+        return true;
+    });
 }
 
 class MissingAttributes extends Error {
