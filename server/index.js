@@ -43,16 +43,15 @@ var driverService = new DriverService.DriverService(DB, driverDao, uniqueIdServi
 var groceryStoreService = new GroceryStoreService.GroceryStoreService(DB, groceryStoreDao, uniqueIdService);
 var orderProcessor = new OrderProcessor.OrderProcessor(DB, orderDao, groceryStoreDao, driverDao, foodBankDao, uniqueIdService);
 
-
-/*exports.pruneDaily = functions.pubsub.schedule('0 0 * * *').onRun((context) => {
-    groceryStoreDao.pruneInventory();
-    return null;
-});*/
-
 const validateFirebaseIdToken = async(req,res,next)=>{
     AuthenticationService.checkRequestAuth(admin,req,res,next);
 }
 app.use(validateFirebaseIdToken);
+
+// exports.pruneDaily = functions.pubsub.schedule('0 0 * * *').onRun((context) => {
+//     groceryStoreDao.pruneInventory();
+//     return null;
+// });
 
 /*******************Order EndPoint *************************/
 app.post("/order/statusUpdate", async (request, response) => {
@@ -79,7 +78,7 @@ app.post("/foodBank/placeOrder", async (request, response) => {
         response.status(202).send(e.message)
         return
     }
-    response.status(200).send("Order Id " + order.getId() + " status is " + order.getStatus());
+    response.status(200).send({id: order.getId(), status:order.getStatus()});
 });
 
 app.post('/foodBank/updateUserAccount', async (request, response) => {
