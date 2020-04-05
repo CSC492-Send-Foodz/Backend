@@ -10,8 +10,6 @@ class OrderProcessor {
         this.driverDao = driverDao;
         this.foodBankDao = foodBankDao;
         this.uniqueIdService = uniqueIdService;
-
-        this.initOrderListener();
     }
 
 
@@ -62,55 +60,12 @@ class OrderProcessor {
                 return Order.OrderStates.INVALID;
         }
     }
-    initOrderListener() {
-        this._orderQuery.get().then(activeOrders => {
-            activeOrders.docs.forEach(activeOrder => {
-                this._initOrderListener(activeOrder.id);
-            });
-            return true;
-        }).catch(error => {
-            console.log(error);
-        })
-    }
-
-    _initOrderListener(id) {
-        this._orderQuery.doc(`${id}`).onSnapshot(orderSnapshot => {
-            if (orderSnapshot.data() !== undefined && orderSnapshot.data().inventory !== undefined) {
-                var orderRef = orderSnapshot.data();
-                var order = new Order.Order(orderRef.id, orderRef.status, orderRef.groceryStoreId, orderRef.foodBankId,
-                    orderRef.driverId, orderRef.recieved, orderRef.inventory, orderRef.quantity);
-                var status = order.getStatus();
-
-                switch (status) {
-                    case "Looking For Driver":
-                        this.driverDao.notifyAllValidDrivers(order);
-                        return
-
-                    case "In Progress":
-                        console.log('Advanced Shipping Notice - drivers');
-                        console.log('Advanced Shipping Notice - grocery');
-                        return
-
-                    case "Picked Up":
-                        console.log('Order ' + order.getId() + ' received');
-                        return
-                }
-            }
-        });
-    }
 
     async processOrder(order) {
         await this.groceryStoreDao.isOrderValid(order).then(res => {
             if (res) {
-                this.orderDao.addToOrders(order).then(
-                    res => {
-                        if (res.writeTime !== undefined) this._initOrderListener(order.getId());
-                        return;
-                        
-                    }).catch(error=>{
-                        console.log(error);
-                    });
-                order.setStatus(Order.OrderStates.LOOKING_FOR_DRIVER);
+                this.orderDao.addToOrders(order)
+                order.setStatus(Order.OrderStates.LOOKING_FOR_DRIVER)
             }
             else {
                 order.setStatus(Order.OrderStates.UNABLE_TO_COMPLETE);
