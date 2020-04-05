@@ -43,8 +43,8 @@ var driverService = new DriverService.DriverService(DB, driverDao, uniqueIdServi
 var groceryStoreService = new GroceryStoreService.GroceryStoreService(DB, groceryStoreDao, uniqueIdService);
 var orderProcessor = new OrderProcessor.OrderProcessor(DB, orderDao, groceryStoreDao, driverDao, foodBankDao, uniqueIdService);
 
-const validateFirebaseIdToken = async(req,res,next)=>{
-    AuthenticationService.checkRequestAuth(admin,req,res,next);
+const validateFirebaseIdToken = async (req, res, next) => {
+    AuthenticationService.checkRequestAuth(admin, req, res, next);
 }
 app.use(validateFirebaseIdToken);
 
@@ -62,7 +62,12 @@ app.post("/order/statusUpdate", async (request, response) => {
         response.status(202).send(e.message)
         return
     }
-    response.status(200).send("Order " + request.body.id + " New Status: " + request.body.status);
+    response.status(200).send(
+        {
+            id: request.body.id,
+            status: request.body.status
+        }
+    );
 
 });
 
@@ -78,7 +83,12 @@ app.post("/foodBank/placeOrder", async (request, response) => {
         response.status(202).send(e.message)
         return
     }
-    response.status(200).send({id: order.getId(), status:order.getStatus()});
+    response.status(200).send(
+        {
+            id: order.getId(),
+            status: order.getStatus()
+        }
+    );
 });
 
 app.post('/foodBank/updateUserAccount', async (request, response) => {
@@ -90,7 +100,11 @@ app.post('/foodBank/updateUserAccount', async (request, response) => {
         response.status(400).send(e.message)
         return
     }
-    response.status(200).send("Food Bank " + foodBank.getId() + " Account Updated");
+    response.status(200).send(
+        {
+            id: foodBank.getId()
+        }
+    );
 });
 
 /*****************Grocery Store EndPoint **********************/
@@ -103,7 +117,11 @@ app.post("/groceryStore/updateUserAccount", async (request, response) => {
         response.status(400).send(e.message)
         return
     }
-    response.status(200).send("Grocery Store " + groceryStore.getId() + " Account Updated");
+    response.status(200).send(
+        {
+            id: groceryStore.getId()
+        }
+    );
 });
 
 app.post("/groceryStore/updateInventory", async (request, response) => {
@@ -115,7 +133,11 @@ app.post("/groceryStore/updateInventory", async (request, response) => {
         response.status(202).send(e.message)
         return
     }
-    response.status(200).send("Grocery Store " + ediOrder.getGroceryStoreId() + " Inventory Updated");
+    response.status(200).send(
+        {
+            id: ediOrder.getGroceryStoreId()
+        }
+    );
 });
 
 app.post("/groceryStore/removeInventoryItem", async (request, response) => {
@@ -126,7 +148,11 @@ app.post("/groceryStore/removeInventoryItem", async (request, response) => {
         response.status(202).send(e.message)
         return
     }
-    response.status(200).send("Grocery Store Inventory Item" + request.body.id + " Deleted");
+    response.status(200).send(
+        {
+            id: request.body.id
+        }
+    );
 });
 
 /*****************Driver EndPoint **********************/
@@ -139,8 +165,12 @@ app.post("/driver/statusUpdate", async (request, response) => {
         response.status(202).send(e.message)
         return
     }
-    response.status(200).send("Driver " + request.body.id + " New Status: " + request.body.status);
-
+    response.status(200).send(
+        {
+            id: request.body.id,
+            status: request.body.status
+        }
+    );
 });
 
 app.post("/driver/updateUserAccount", async (request, response) => {
@@ -152,7 +182,11 @@ app.post("/driver/updateUserAccount", async (request, response) => {
         response.status(202).send(e.message)
         return
     }
-    response.status(200).send("Driver " + driver.getId() + " Account Updated");
+    response.status(200).send(
+        {
+            id: driver.getId()
+        }
+    );
 });
 
 /***************** Auth Endpoint **********************/
