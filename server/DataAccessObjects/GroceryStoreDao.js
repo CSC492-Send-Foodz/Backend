@@ -47,7 +47,7 @@ class GroceryStoreDao {
         var updateItems = {};
         for (const [itemId, item] of Object.entries(orderInventory)) {
             var remainingQuantity = Number(groceryStoreInventory[itemId]["quantity"]) - item.getQuantity();
-            if (remainingQuantity == 0) {
+            if (remainingQuantity === 0) {
                 this.deleteInventoryItem(item.getId(), item.getGroceryStoreId())
             } else {
                 updateItems[item.getId()] = {
@@ -61,7 +61,7 @@ class GroceryStoreDao {
                 };
             }
         }
-        if (Object.keys(updateItems).length != 0) {
+        if (Object.keys(updateItems).length !== 0) {
             this.DB.collection("GroceryStores").doc(groceryStoreId).collection("InventoryCollection").doc("Items").update(updateItems);
         }
 
