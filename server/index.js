@@ -49,8 +49,8 @@ var orderProcessor = new OrderProcessor.OrderProcessor(DB, orderDao, groceryStor
     return null;
 });*/
 
-const validateFirebaseIdToken = async(req,res,next)=>{
-    AuthenticationService.checkRequestAuth(admin,req,res,next);
+const validateFirebaseIdToken = async (req, res, next) => {
+    AuthenticationService.checkRequestAuth(admin, req, res, next);
 }
 app.use(validateFirebaseIdToken);
 
@@ -88,7 +88,7 @@ app.post('/foodBank/updateUserAccount', async (request, response) => {
         foodBankService.updateFoodBankAccount(foodBank);
     }
     catch (e) {
-        response.status(202).send(e.message)
+        response.status(400).send(e.message)
         return
     }
     response.status(200).send("Food Bank " + foodBank.getId() + " Account Updated");
@@ -101,7 +101,7 @@ app.post("/groceryStore/updateUserAccount", async (request, response) => {
         groceryStoreService.updateGroceryStoreAccount(groceryStore);
     }
     catch (e) {
-        response.status(202).send(e.message)
+        response.status(400).send(e.message)
         return
     }
     response.status(200).send("Grocery Store " + groceryStore.getId() + " Account Updated");
@@ -155,5 +155,19 @@ app.post("/driver/updateUserAccount", async (request, response) => {
     }
     response.status(200).send("Driver " + driver.getId() + " Account Updated");
 });
+
+/***************** Auth Endpoint **********************/
+
+app.post("/auth/checkUserType", async (request, response) => {
+    try {
+        var type = request.body.type;
+        var altType = type === "GroceryStores" ? "Foodbanks" : "GroceryStores";
+        var res = await AuthenticationService.checkUserType(DB, request.body.id, type);
+        response.status(200).send(res ? type : altType);
+    }
+    catch (e) {
+        response.status(400).send(e.message);
+    }
+})
 
 exports.app = functions.https.onRequest(app);

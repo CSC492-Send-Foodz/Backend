@@ -16,8 +16,6 @@ class FoodBankService {
             foodBankRef.locationId);
 
         AssertRequestValid.assertObjectValid(foodBank);
-        if (foodBankRef.id !== undefined) await AssertRequestValid.assertValidFoodBank(this.foodBankDao, foodBank.getId())
-
         return foodBank;
     }
 

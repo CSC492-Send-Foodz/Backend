@@ -45,6 +45,15 @@ async function decodeAuth(admin, req) {
     return await admin.auth().verifyIdToken(idToken);
 }
 
+async function checkUserType(db, id, type) {
+    return db.collection(type).doc(id).get().then(doc => {
+        return doc.exists;
+    }).catch(error => {
+        console.log("Error getting doc");
+        return false;
+    });
+}
+
 module.exports = {
-    checkRequestAuth
+    checkRequestAuth, checkUserType
 }

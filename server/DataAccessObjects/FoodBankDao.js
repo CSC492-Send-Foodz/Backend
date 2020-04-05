@@ -4,12 +4,12 @@ class FoodBankDao {
     }
 
     async getFoodBankAccountData(foodBankId){
-        let foodBank = await this.DB.collection("FoodBank").doc(`${foodBankId}`).get();
+        let foodBank = await this.DB.collection("Foodbanks").doc(`${foodBankId}`).get();
         return foodBank;
     }
 
     updateFoodBankAccountData(foodBank) {
-        this.DB.collection("FoodBank").doc(`${foodBank.getId()}`).set({
+        this.DB.collection("Foodbanks").doc(`${foodBank.getId()}`).set({
             name: foodBank.getName(),
             address: foodBank.getAddress(),
             locationId: foodBank.getLocationId()

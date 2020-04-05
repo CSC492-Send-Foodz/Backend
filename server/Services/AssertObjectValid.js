@@ -25,7 +25,7 @@ function assertValidFoodBank(foodBankIdDao, id) {
         if (!doc.exists) {
             throw new InvalidAccountId(id);
         }
-        return true;
+        return;
     });
 }
 
@@ -34,7 +34,7 @@ function assertValidDriver(driverDao, id) {
         if (!doc.exists) {
             throw new InvalidAccountId(id);
         }
-        return true;
+        return;
     });
 }
 
@@ -43,7 +43,7 @@ function assertValidGroceryStore(groceryStoreDao, id) {
         if (!doc.exists) {
             throw new InvalidAccountId(id);
         }
-        return true;
+        return;
     });
 }
 
@@ -52,7 +52,7 @@ function assertValidActiveOrder(orderDao, id) {
         if (!doc.exists) {
             throw new InvalidAccountId(id);
         }
-        return true;
+        return;
     });
 }
 
