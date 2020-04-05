@@ -112,8 +112,11 @@ class GroceryStoreDao {
                 }
 
                 this.DB.collection("GroceryStores").doc(id).collection("InventoryCollection").doc("Items").set(inventory);
+                return true;
 
-            }).catch(err => { console.log("Error getting store", err) })
+            }).catch(err => {
+                console.log("Error getting store", err);
+            });
         } catch (error) {
             console.log("Error getting inventory", error);
         }

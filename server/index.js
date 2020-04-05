@@ -5,8 +5,10 @@ const functions = require("firebase-functions");
 // Endpoint Imports
 const express = require("express")
 const cors = require('cors');
+const cookieParser = require("cookie-parser");
 const app = express();
 app.use(cors());
+app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
@@ -16,7 +18,7 @@ const OrderProcessor = require("./Services/OrderProcessor");
 const FoodBankService = require("./Services/FoodBankService");
 const DriverService = require("./Services/DriverService");
 const GroceryStoreService = require("./Services/GroceryStoreService");
-const LoginService = require("./Services/LoginService")
+const AuthenticationService = require("./Services/AuthenticationService")
 
 //Daos Imports
 const FoodBankDao = require('./DataAccessObjects/FoodBankDao');
@@ -40,14 +42,17 @@ var foodBankService = new FoodBankService.FoodBankService(foodBankDao, uniqueIdS
 var driverService = new DriverService.DriverService(DB, driverDao, uniqueIdService, orderDao);
 var groceryStoreService = new GroceryStoreService.GroceryStoreService(DB, groceryStoreDao, uniqueIdService);
 var orderProcessor = new OrderProcessor.OrderProcessor(DB, orderDao, groceryStoreDao, driverDao, foodBankDao, uniqueIdService);
-var loginService = new LoginService.LoginService(DB, uniqueIdService);
 
-
+const validateFirebaseIdToken = async(req,res,next)=>{
+    AuthenticationService.checkRequestAuth(admin,req,res,next);
+}
+app.use(validateFirebaseIdToken);
 
 // exports.pruneDaily = functions.pubsub.schedule('0 0 * * *').onRun((context) => {
 //     groceryStoreDao.pruneInventory();
 //     return null;
 // });
+
 /*******************Order EndPoint *************************/
 app.post("/order/statusUpdate", async (request, response) => {
     try {
@@ -82,7 +87,7 @@ app.post('/foodBank/updateUserAccount', async (request, response) => {
         foodBankService.updateFoodBankAccount(foodBank);
     }
     catch (e) {
-        response.status(202).send(e.message)
+        response.status(400).send(e.message)
         return
     }
     response.status(200).send("Food Bank " + foodBank.getId() + " Account Updated");
@@ -95,7 +100,7 @@ app.post("/groceryStore/updateUserAccount", async (request, response) => {
         groceryStoreService.updateGroceryStoreAccount(groceryStore);
     }
     catch (e) {
-        response.status(202).send(e.message)
+        response.status(400).send(e.message)
         return
     }
     response.status(200).send("Grocery Store " + groceryStore.getId() + " Account Updated");
@@ -150,31 +155,18 @@ app.post("/driver/updateUserAccount", async (request, response) => {
     response.status(200).send("Driver " + driver.getId() + " Account Updated");
 });
 
-/*****************Login EndPoint **********************/
+/***************** Auth Endpoint **********************/
 
-app.post("/login/createAccount", async (request, response) => {
+app.post("/auth/checkUserType", async (request, response) => {
     try {
-        var res = await loginService.createAcount(request.body.email, request.body.password, request.body.type);
-        response.status(200).send(res);
-    } catch (e) {
-        response.status(400).send(e.message)
-        return
+        var type = request.body.type;
+        var altType = type === "GroceryStores" ? "Foodbanks" : "GroceryStores";
+        var res = await AuthenticationService.checkUserType(DB, request.body.id, type);
+        response.status(200).send(res ? type : altType);
     }
-});
-
-app.post("/login/authenticate", async (request, response) => {
-    try {
-        var res = await loginService.authenticate(request.body.email, request.body.password);
-        if (res[0]) {
-            res = res[1];
-            response.status(200).send({ "message": "OK", "id": res[0], "email": request.body.email, "type": res[1] });
-        } else {
-            response.status(200).send({ "message": res[1] })
-        }
-    } catch (e) {
-        response.status(400).send(e.message)
-        return
+    catch (e) {
+        response.status(400).send(e.message);
     }
-});
+})
 
 exports.app = functions.https.onRequest(app);

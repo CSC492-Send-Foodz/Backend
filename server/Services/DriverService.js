@@ -34,8 +34,6 @@ class DriverService {
         this.driverDao.updateDriverStatus(driverId, this._setOrderStatus(newStatus));
     }
 
-
-  
     _setOrderStatus(newStatus) {
         switch (newStatus) {
             case "Available":
