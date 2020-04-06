@@ -2,9 +2,8 @@ const FoodBank = require("../Models/FoodBank");
 const AssertRequestValid = require("./AssertObjectValid");
 
 class FoodBankService {
-    constructor(foodBankDao, uniqueIdService) {
+    constructor(foodBankDao) {
         this.foodBankDao = foodBankDao;
-        this.uniqueIdService = uniqueIdService;
         this.collectionQuery = "Drivers";
     }
 

@@ -4,9 +4,8 @@ const Item = require("../Models/Item");
 const AssertRequestValid = require("./AssertObjectValid");
 
 class GroceryStoreService {
-    constructor(DB, groceryStoreDao, uniqueIdService) {
+    constructor(DB, groceryStoreDao) {
         this.groceryStoreDao = groceryStoreDao;
-        this.uniqueIdService = uniqueIdService;
         this.collectionQuery = "GroceryStores";
         this._GroceryStoresCollectionQuery = DB.collection(this.collectionQuery);
 	}

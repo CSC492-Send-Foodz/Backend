@@ -2,9 +2,8 @@ const Driver = require("../Models/Driver");
 const AssertRequestValid = require("./AssertObjectValid");
 
 class DriverService {
-    constructor(DB, driverDao, uniqueIdService, orderDao) {
+    constructor(DB, driverDao, orderDao) {
         this.driverDao = driverDao;
-        this.uniqueIdService = uniqueIdService;
         this.collectionQuery = "Drivers";
         this._DriverCollectionQuery = DB.collection(this.collectionQuery);
         this.orderDao = orderDao
