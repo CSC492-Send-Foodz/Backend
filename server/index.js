@@ -38,9 +38,9 @@ var foodBankDao = new FoodBankDao.FoodBankDao(DB);
 
 //Initialize Services
 var uniqueIdService = new UniqueIdService.UniqueIdService(DB);
-var foodBankService = new FoodBankService.FoodBankService(foodBankDao, uniqueIdService);
-var driverService = new DriverService.DriverService(DB, driverDao, uniqueIdService, orderDao);
-var groceryStoreService = new GroceryStoreService.GroceryStoreService(DB, groceryStoreDao, uniqueIdService);
+var foodBankService = new FoodBankService.FoodBankService(foodBankDao);
+var driverService = new DriverService.DriverService(DB, driverDao, orderDao);
+var groceryStoreService = new GroceryStoreService.GroceryStoreService(DB, groceryStoreDao);
 var orderProcessor = new OrderProcessor.OrderProcessor(DB, orderDao, groceryStoreDao, driverDao, foodBankDao, uniqueIdService);
 
 const validateFirebaseIdToken = async (req, res, next) => {

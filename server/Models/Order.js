@@ -9,13 +9,13 @@ const OrderStates = {
 
 class Order {
 
-    constructor(id, status, groceryStoreId, foodBankId, driverId, recieved, inventory, quantity) {
+    constructor(id, status, groceryStoreId, foodBankId, driverId, received, inventory, quantity) {
         this.id = id;
         this.status = status;
         this.groceryStoreId = groceryStoreId;
         this.foodBankId = foodBankId;
         this.driverId = driverId;
-        this.recieved = recieved;
+        this.received = received;
         this.completed;
         this.inventory = inventory;
         this.quantity = quantity
@@ -26,7 +26,7 @@ class Order {
     getGroceryStoreId() {return this.groceryStoreId;}
     getFoodBankId() {return this.foodBankId;}
     getDriverId() {return this.driverId;}
-    getRecieved() {return this.recieved;}
+    getReceived() {return this.received;}
     getCompleted() {return this.completed;}
     getInventory() { return this.inventory; }
     getQuantity() { return this.quantity; }

@@ -27,14 +27,14 @@ class OrderProcessor {
     _processOrderInventory(inventoryRef) {
         var inventory = {};
         inventoryRef.forEach(itemRef => inventory[itemRef.id] = new Item.Item(itemRef.id, itemRef.name, itemRef.brand, itemRef.groceryStoreId,
-            itemRef.quantity, Date(itemRef.expirationDate), itemRef.ediOrderNumber))
+            Number(itemRef.quantity), Date(itemRef.expirationDate), itemRef.ediOrderNumber))
         return inventory;
     }
 
     _processOrderQuantity(inventory) {
         var totalQuantity = 0;
         for (const [itemId, item] of Object.entries(inventory)) {
-            totalQuantity += Number(item.getQuantity());
+            totalQuantity += item.getQuantity();
         }
         return totalQuantity;
     }
