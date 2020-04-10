@@ -2,9 +2,8 @@ const FoodBank = require("../Models/FoodBank");
 const AssertRequestValid = require("./AssertObjectValid");
 
 class FoodBankService {
-    constructor(foodBankDao, uniqueIdService) {
+    constructor(foodBankDao) {
         this.foodBankDao = foodBankDao;
-        this.uniqueIdService = uniqueIdService;
         this.collectionQuery = "Drivers";
     }
 
@@ -16,8 +15,6 @@ class FoodBankService {
             foodBankRef.locationId);
 
         AssertRequestValid.assertObjectValid(foodBank);
-        if (foodBankRef.id !== undefined) await AssertRequestValid.assertValidFoodBank(this.foodBankDao, foodBank.getId())
-
         return foodBank;
     }
 

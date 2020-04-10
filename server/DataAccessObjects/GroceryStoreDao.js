@@ -47,7 +47,7 @@ class GroceryStoreDao {
         var updateItems = {};
         for (const [itemId, item] of Object.entries(orderInventory)) {
             var remainingQuantity = Number(groceryStoreInventory[itemId]["quantity"]) - item.getQuantity();
-            if (remainingQuantity == 0) {
+            if (remainingQuantity === 0) {
                 this.deleteInventoryItem(item.getId(), item.getGroceryStoreId())
             } else {
                 updateItems[item.getId()] = {
@@ -61,7 +61,7 @@ class GroceryStoreDao {
                 };
             }
         }
-        if (Object.keys(updateItems).length != 0) {
+        if (Object.keys(updateItems).length !== 0) {
             this.DB.collection("GroceryStores").doc(groceryStoreId).collection("InventoryCollection").doc("Items").update(updateItems);
         }
 
@@ -112,8 +112,11 @@ class GroceryStoreDao {
                 }
 
                 this.DB.collection("GroceryStores").doc(id).collection("InventoryCollection").doc("Items").set(inventory);
+                return true;
 
-            }).catch(err => { console.log("Error getting store", err) })
+            }).catch(err => {
+                console.log("Error getting store", err);
+            });
         } catch (error) {
             console.log("Error getting inventory", error);
         }

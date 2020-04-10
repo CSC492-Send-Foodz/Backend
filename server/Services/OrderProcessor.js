@@ -19,7 +19,7 @@ class OrderProcessor {
             null, Date(orderRef.time), inventory, this._processOrderQuantity(inventory));
         if (orderRef.groceryStoreId !== undefined) await AssertRequestValid.assertValidGroceryStore(this.groceryStoreDao, orderRef.groceryStoreId)
         if (orderRef.foodBankId !== undefined) await AssertRequestValid.assertValidFoodBank(this.foodBankDao, orderRef.foodBankId)
-        
+
         AssertRequestValid.assertObjectValid(order);
         return order
     }
@@ -27,14 +27,14 @@ class OrderProcessor {
     _processOrderInventory(inventoryRef) {
         var inventory = {};
         inventoryRef.forEach(itemRef => inventory[itemRef.id] = new Item.Item(itemRef.id, itemRef.name, itemRef.brand, itemRef.groceryStoreId,
-            itemRef.quantity, Date(itemRef.expirationDate), itemRef.ediOrderNumber))
+            Number(itemRef.quantity), Date(itemRef.expirationDate), itemRef.ediOrderNumber))
         return inventory;
     }
 
     _processOrderQuantity(inventory) {
         var totalQuantity = 0;
         for (const [itemId, item] of Object.entries(inventory)) {
-            totalQuantity += Number(item.getQuantity());
+            totalQuantity += item.getQuantity();
         }
         return totalQuantity;
     }
@@ -46,7 +46,7 @@ class OrderProcessor {
 
             case "Unable to completed":
                 return Order.OrderStates.UNABLE_TO_COMPLETE;
-                
+
             case "Driver on route for pick up":
                 return Order.OrderStates.PICKUP_IN_PROGRESS;
 
@@ -67,17 +67,18 @@ class OrderProcessor {
                 this.orderDao.addToOrders(order)
                 order.setStatus(Order.OrderStates.LOOKING_FOR_DRIVER)
             }
-            else{
-                order.setStatus(Order.OrderStates.UNABLE_TO_COMPLETE)
+            else {
+                order.setStatus(Order.OrderStates.UNABLE_TO_COMPLETE);
             }
+            return true;
         })
     }
 
-    async updateActiveOrderStatus(orderId, status){
-        if(orderId !== undefined) await AssertRequestValid.assertValidActiveOrder(this.orderDao, orderId)
+    async updateActiveOrderStatus(orderId, status) {
+        if (orderId !== undefined) await AssertRequestValid.assertValidActiveOrder(this.orderDao, orderId)
         this.orderDao.updateActiveOrderStatus(orderId, this._setOrderStatus(status));
     }
-   
+
 }
 
 module.exports = {

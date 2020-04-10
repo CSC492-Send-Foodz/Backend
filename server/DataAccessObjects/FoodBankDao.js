@@ -9,7 +9,7 @@ class FoodBankDao {
     }
 
     updateFoodBankAccountData(foodBank) {
-        this.DB.collection("FoodBank").doc(`${foodBank.getId()}`).set({
+        this.DB.collection("Foodbanks").doc(`${foodBank.getId()}`).set({
             name: foodBank.getName(),
             address: foodBank.getAddress(),
             locationId: foodBank.getLocationId()
