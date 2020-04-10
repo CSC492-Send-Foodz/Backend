@@ -1,5 +1,5 @@
 requirements = {
-    "Order": ["status", "groceryStoreId", "foodBankId", "driverId", "recieved", "inventory"],
+    "Order": ["status", "groceryStoreId", "foodBankId", "driverId", "received", "inventory"],
     "Item": ["id", "name", "brand", "groceryStoreId", "quantity", "expirationDate", "ediOrderNumber"],
     "Driver": ["id", "status", "name", "status", "currentLocation"],
     "FoodBank": ["id", "name", "address", "locationId"],
