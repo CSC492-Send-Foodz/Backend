@@ -62,6 +62,10 @@ app.post("/order/statusUpdate", async (request, response) => {
         response.status(202).send(e.message)
         return
     }
+    if (request.body.status === "Inventory picked up") {
+        pushNotifs(`You picked up order ${request.body.id}!`);
+
+    }
     response.status(200).send(
         {
             id: request.body.id,
@@ -160,6 +164,7 @@ app.post("/groceryStore/removeInventoryItem", async (request, response) => {
 app.post("/driver/statusUpdate", async (request, response) => {
     try {
         await driverService.updateDriverStatus(request.body.id, request.body.status);
+        subscribe([request.body.token]);
     }
     catch (e) {
         response.status(202).send(e.message)
@@ -204,3 +209,27 @@ app.post("/auth/checkUserType", async (request, response) => {
 })
 
 exports.app = functions.https.onRequest(app);
+
+/***************** Push Notifications **********************/
+
+function pushNotifs(message) {
+    var payload = {
+        notification: {
+            title: message
+        }
+    }
+
+    admin.messaging().sendToTopic("notifications", payload).then(response => {
+        console.log("Successfully sent message: ", response)
+    }).catch(err => {
+        console.log("Error sending message: ", err)
+    })
+}
+
+function subscribe(tokens) {
+    admin.messaging().subscribeToTopic(tokens, "notifications")
+    .then(
+        response => console.log("Successfully subscribed to notifications: ", response)
+    )
+    .catch(err => console.log("Eror subscribing to notifications: ", err))
+}
