@@ -1,0 +1,26 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "A multi-platform (web app & mobile) service that helps grocery retailers donate to-be-discarded but edible produce to nearby food banks. The service will connect volunteer drivers to deliver matched goods. In return, volunteer drivers will earn reward points for free grocery produce.",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "dependencies": {
+    "vuex": "^3.1.2"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CSC492-Send-Foodz/Backend.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/CSC492-Send-Foodz/Backend/issues"
+  },
+  "homepage": "https://github.com/CSC492-Send-Foodz/Backend#readme"
+}
