@@ -64,8 +64,8 @@ class OrderProcessor {
     async processOrder(order) {
         await this.groceryStoreDao.isOrderValid(order).then(res => {
             if (res) {
-                this.orderDao.addToOrders(order)
                 order.setStatus(Order.OrderStates.LOOKING_FOR_DRIVER)
+                this.orderDao.addToOrders(order)
             }
             else {
                 order.setStatus(Order.OrderStates.UNABLE_TO_COMPLETE);
